@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
+	"time"
 )
 
 func CreateTodoList(c *gin.Context) {
@@ -32,14 +33,14 @@ func GetTodoLists(c *gin.Context) {
 }
 
 func GetTodoList(c *gin.Context) {
-	id := c.Params.ByName("id")
+	listId := c.Params.ByName("listId")
 
 	db := models.InitDb()
 	defer db.Close()
 
 	var todoList models.TodoList
 
-	db.First(&todoList, id)
+	db.First(&todoList, listId)
 
 	if todoList.ID != 0 {
 		c.JSON(200, todoList)
@@ -49,7 +50,7 @@ func GetTodoList(c *gin.Context) {
 }
 
 func UpdateTodoList(c *gin.Context) {
-	id := c.Params.ByName("id")
+	listId := c.Params.ByName("listId")
 
 	db := models.InitDb()
 	defer db.Close()
@@ -63,12 +64,14 @@ func UpdateTodoList(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, id)
+	db.First(&todoList, listId)
 
 	if todoList.ID != 0 {
 		todoList = models.TodoList{
 			ID:    todoList.ID,
 			Title: newTodoList.Title,
+			CreatedAt: todoList.CreatedAt,
+			UpdatedAt: time.Now(),
 		}
 
 		db.Save(&todoList)
@@ -80,14 +83,14 @@ func UpdateTodoList(c *gin.Context) {
 }
 
 func DeleteTodoList(c *gin.Context) {
-	id := c.Params.ByName("id")
+	listId := c.Params.ByName("listId")
 
 	db := models.InitDb()
 	defer db.Close()
 
 	var todoList models.TodoList
 
-	db.First(&todoList, id)
+	db.First(&todoList, listId)
 
 	if todoList.ID != 0 {
 		db.Delete(&todoList)

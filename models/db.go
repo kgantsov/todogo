@@ -21,6 +21,11 @@ func CreateTables(db *gorm.DB) {
 		db.CreateTable(&TodoList{})
 		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&TodoList{})
 	}
+
+	if !db.HasTable(&Todo{}) {
+		db.CreateTable(&Todo{})
+		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&Todo{})
+	}
 }
 
 func DropTables(db *gorm.DB) {
