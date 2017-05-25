@@ -5,13 +5,16 @@ import (
 	"gopkg.in/gin-gonic/gin.v1"
 	"strconv"
 	"time"
+	"github.com/jinzhu/gorm"
 )
 
 func CreateTodo(c *gin.Context) {
-	listId, _ := strconv.ParseUint(c.Params.ByName("listId"), 0, 64)
+	db, ok := c.MustGet("db").(gorm.DB)
+	if !ok {
+		c.JSON(500, gin.H{"error": "No connection to DB"})
+	}
 
-	db := models.InitDb()
-	defer db.Close()
+	listId, _ := strconv.ParseUint(c.Params.ByName("listId"), 0, 64)
 
 	var todoList models.TodoList
 
@@ -34,10 +37,12 @@ func CreateTodo(c *gin.Context) {
 }
 
 func GetTodos(c *gin.Context) {
-	listId := c.Params.ByName("listId")
+	db, ok := c.MustGet("db").(gorm.DB)
+	if !ok {
+		c.JSON(500, gin.H{"error": "No connection to DB"})
+	}
 
-	db := models.InitDb()
-	defer db.Close()
+	listId := c.Params.ByName("listId")
 
 	var todoList models.TodoList
 
@@ -55,11 +60,13 @@ func GetTodos(c *gin.Context) {
 }
 
 func GetTodo(c *gin.Context) {
+	db, ok := c.MustGet("db").(gorm.DB)
+	if !ok {
+		c.JSON(500, gin.H{"error": "No connection to DB"})
+	}
+
 	listId := c.Params.ByName("listId")
 	todoId := c.Params.ByName("todoId")
-
-	db := models.InitDb()
-	defer db.Close()
 
 	var todoList models.TodoList
 
@@ -82,11 +89,13 @@ func GetTodo(c *gin.Context) {
 }
 
 func UpdateTodo(c *gin.Context) {
+	db, ok := c.MustGet("db").(gorm.DB)
+	if !ok {
+		c.JSON(500, gin.H{"error": "No connection to DB"})
+	}
+
 	listId, _ := strconv.ParseUint(c.Params.ByName("listId"), 0, 64)
 	todoId := c.Params.ByName("todoId")
-
-	db := models.InitDb()
-	defer db.Close()
 
 	var newTodo models.Todo
 	e := c.BindJSON(&newTodo)
@@ -127,11 +136,13 @@ func UpdateTodo(c *gin.Context) {
 }
 
 func DeleteTodo(c *gin.Context) {
+	db, ok := c.MustGet("db").(gorm.DB)
+	if !ok {
+		c.JSON(500, gin.H{"error": "No connection to DB"})
+	}
+
 	listId := c.Params.ByName("listId")
 	todoId := c.Params.ByName("todoId")
-
-	db := models.InitDb()
-	defer db.Close()
 
 	var todoList models.TodoList
 

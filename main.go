@@ -4,14 +4,26 @@ import (
 	"github.com/kgantsov/todogo/handlers"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/jinzhu/gorm"
 )
+
+func DBMiddleware(db gorm.DB) gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+		c.Set("db", db)
+
+		c.Next()
+	}
+}
+
 
 func main() {
 	db := models.InitDb()
-	defer db.Close()
 	models.CreateTables(db)
 
-	r := gin.New()
+	r := gin.Default()
+
+	r.Use(DBMiddleware(*db))
 
 	v1 := r.Group("api/v1")
 	{
