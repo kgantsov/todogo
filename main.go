@@ -1,10 +1,13 @@
 package main
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/handlers"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
-	"github.com/jinzhu/gorm"
+	"os"
+	"flag"
+	"fmt"
 )
 
 func DBMiddleware(db gorm.DB) gin.HandlerFunc {
@@ -16,28 +19,30 @@ func DBMiddleware(db gorm.DB) gin.HandlerFunc {
 	}
 }
 
-
 func main() {
-	db := models.InitDb()
+	debug := flag.Bool("debug", false, "Debug flag")
+	port := flag.Int("port", 8080, "Port")
+
+	flag.Parse()
+
+	db := models.InitDb(
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		*debug,
+	)
 	models.CreateTables(db)
 
-	r := gin.Default()
+	r := gin.New()
+
+	r.Use(gin.Recovery())
+
+	if *debug == true {
+		r.Use(gin.Logger())
+	}
 
 	r.Use(DBMiddleware(*db))
 
-	v1 := r.Group("api/v1")
-	{
-		v1.POST("/list/", handlers.CreateTodoList)
-		v1.GET("/list/", handlers.GetTodoLists)
-		v1.GET("/list/:listId/", handlers.GetTodoList)
-		v1.PUT("/list/:listId/", handlers.UpdateTodoList)
-		v1.DELETE("/list/:listId/", handlers.DeleteTodoList)
-
-		v1.POST("/list/:listId/todo/", handlers.CreateTodo)
-		v1.GET("/list/:listId/todo/", handlers.GetTodos)
-		v1.GET("/list/:listId/todo/:todoId/", handlers.GetTodo)
-		v1.PUT("/list/:listId/todo/:todoId/", handlers.UpdateTodo)
-		v1.DELETE("/list/:listId/todo/:todoId/", handlers.DeleteTodo)
-	}
-	r.Run(":8080")
+	handlers.DefineRoutes(r)
+	r.Run(fmt.Sprintf(":%d", *port))
 }

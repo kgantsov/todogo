@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
 	"strconv"
 	"time"
-	"github.com/jinzhu/gorm"
 )
 
 func CreateTodo(c *gin.Context) {

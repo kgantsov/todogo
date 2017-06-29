@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
 	"time"
-	"github.com/jinzhu/gorm"
 )
 
 func CreateTodoList(c *gin.Context) {
@@ -77,8 +77,8 @@ func UpdateTodoList(c *gin.Context) {
 
 	if todoList.ID != 0 {
 		todoList = models.TodoList{
-			ID:    todoList.ID,
-			Title: newTodoList.Title,
+			ID:        todoList.ID,
+			Title:     newTodoList.Title,
 			CreatedAt: todoList.CreatedAt,
 			UpdatedAt: time.Now(),
 		}
