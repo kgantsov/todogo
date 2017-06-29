@@ -78,8 +78,7 @@ func GetTodo(c *gin.Context) {
 
 	var todo models.Todo
 
-	db.First(&todo, todoId)
-	db.Where("todo_list_id = ? and todoId = ?", listId, todoId).Find(&todo)
+	db.Where("todo_list_id = ? and id = ?", listId, todoId).Find(&todo)
 
 	if todo.ID != 0 {
 		c.JSON(200, todo)
@@ -114,8 +113,7 @@ func UpdateTodo(c *gin.Context) {
 
 	var todo models.Todo
 
-	db.First(&todo, todoId)
-	db.Where("todo_list_id = ? and todoId = ?", listId, todoId).Find(&todo)
+	db.Where("todo_list_id = ? and id = ?", listId, todoId).Find(&todo)
 
 	if todo.ID != 0 {
 		todo = models.Todo{
@@ -154,8 +152,7 @@ func DeleteTodo(c *gin.Context) {
 
 	var todo models.Todo
 
-	db.First(&todo, todoId)
-	db.Where("todo_list_id = ? and todoId = ?", listId, todoId).Find(&todo)
+	db.Where("todo_list_id = ? and id = ?", listId, todoId).Find(&todo)
 
 	if todo.ID != 0 {
 		db.Delete(&todo)

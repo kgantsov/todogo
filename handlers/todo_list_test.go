@@ -20,10 +20,10 @@ func DBMiddleware(db gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func CreateFixtures(db *gorm.DB) {
-	db.Create(&models.TodoList{Title: "Shopping list"})
-	db.Create(&models.TodoList{Title: "Work list"})
-	db.Create(&models.TodoList{Title: "Sport list"})
+func CreateTodoListFixtures(db *gorm.DB) {
+	db.Create(&models.TodoList{ID: 1, Title: "Shopping list"})
+	db.Create(&models.TodoList{ID: 2, Title: "Work list"})
+	db.Create(&models.TodoList{ID: 3, Title: "Sport list"})
 }
 
 func checkResponseCode(t *testing.T, expected, actual int) {
@@ -32,7 +32,7 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 	}
 }
 
-func executeRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
+func ExecuteRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 
 	gin.SetMode(gin.TestMode)
@@ -54,9 +54,9 @@ func TestGetTodoLists(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusOK, resp.Code)
 
@@ -100,7 +100,7 @@ func TestGetTodoListsEmptyTable(t *testing.T) {
 	models.DropTables(db)
 	models.CreateTables(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusOK, resp.Code)
 
@@ -126,9 +126,9 @@ func TestGetTodoList(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusOK, resp.Code)
 
@@ -157,9 +157,9 @@ func TestGetTodoListWrongID(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusNotFound, resp.Code)
 
@@ -190,9 +190,9 @@ func TestCreateTodoList(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusCreated, resp.Code)
 
@@ -223,9 +223,9 @@ func TestCreateTodoListMissedFields(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusBadRequest, resp.Code)
 }
@@ -239,9 +239,9 @@ func TestUpdateTodoList(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusOK, resp.Code)
 
@@ -272,9 +272,9 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusNotFound, resp.Code)
 
@@ -303,9 +303,9 @@ func TestDeleteTodoList(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusNoContent, resp.Code)
 }
@@ -317,9 +317,9 @@ func TestDeleteTodoListWrongID(t *testing.T) {
 
 	models.DropTables(db)
 	models.CreateTables(db)
-	CreateFixtures(db)
+	CreateTodoListFixtures(db)
 
-	resp := executeRequest(db, req)
+	resp := ExecuteRequest(db, req)
 
 	checkResponseCode(t, http.StatusNotFound, resp.Code)
 
