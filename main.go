@@ -19,6 +19,13 @@ func DBMiddleware(db gorm.DB) gin.HandlerFunc {
 	}
 }
 
+func CorsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Next()
+	}
+}
+
 func main() {
 	debug := flag.Bool("debug", false, "Debug flag")
 	port := flag.Int("port", 8080, "Port")
@@ -39,6 +46,7 @@ func main() {
 
 	if *debug == true {
 		r.Use(gin.Logger())
+		r.Use(CorsMiddleware())
 	}
 
 	r.Use(DBMiddleware(*db))
