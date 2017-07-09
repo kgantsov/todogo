@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+func OptionsTodoList(c *gin.Context) {
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "DELETE,POST,PUT")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	c.Next()
+}
+
 func CreateTodoList(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
