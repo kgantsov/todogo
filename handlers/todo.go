@@ -60,7 +60,7 @@ func GetTodos(c *gin.Context) {
 
 	var todos []models.Todo
 
-	db.Where("todo_list_id = ?", listId).Find(&todos)
+	db.Order("id asc").Where("todo_list_id = ?", listId).Find(&todos)
 
 	c.JSON(200, todos)
 }

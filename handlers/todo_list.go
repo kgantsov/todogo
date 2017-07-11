@@ -38,7 +38,7 @@ func GetTodoLists(c *gin.Context) {
 
 	var todoLists []models.TodoList
 
-	db.Find(&todoLists)
+	db.Order("id asc").Find(&todoLists)
 
 	c.JSON(200, todoLists)
 }
