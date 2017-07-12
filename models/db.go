@@ -37,12 +37,13 @@ func InitTestDb() *gorm.DB {
 func CreateTables(db *gorm.DB) {
 	if !db.HasTable(&TodoList{}) {
 		db.CreateTable(&TodoList{})
-		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&TodoList{})
 	}
 
 	if !db.HasTable(&Todo{}) {
 		db.CreateTable(&Todo{})
-		db.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&Todo{})
+		db.Model(&Todo{}).AddForeignKey(
+			"todo_list_id", "todo_lists(id)", "CASCADE", "RESTRICT",
+		)
 	}
 }
 
