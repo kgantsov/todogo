@@ -1,0 +1,6 @@
+
+DB_HOST=postgres
+DB_NAME=todogo
+DB_USERNAME=todogo
+DB_PASSWORD=todogowassword
+DB_URI=postgresql://todogo:todogowassword@postgres:5432/todogo
