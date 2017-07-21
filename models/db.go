@@ -9,7 +9,7 @@ import (
 
 func InitDb(host, user, password, dbName string, debug bool) *gorm.DB {
 	connectionString := fmt.Sprintf(
-		"host=%s sslmode=disable user=%s password=%s dbName=%s", host, user, password, dbName,
+		"host=%s sslmode=disable user=%s password=%s dbname=%s", host, user, password, dbName,
 	)
 
 	db, err := gorm.Open("postgres", connectionString)
