@@ -50,7 +50,7 @@ func ExecuteRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
 func TestGetTodoLists(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -95,7 +95,7 @@ func TestGetTodoLists(t *testing.T) {
 func TestGetTodoListsEmptyTable(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -122,7 +122,7 @@ func TestGetTodoListsEmptyTable(t *testing.T) {
 func TestGetTodoList(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/2/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -153,7 +153,7 @@ func TestGetTodoList(t *testing.T) {
 func TestGetTodoListWrongID(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/777/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -186,7 +186,7 @@ func TestCreateTodoList(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/api/v1/list/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -206,9 +206,6 @@ func TestCreateTodoList(t *testing.T) {
 		return
 	}
 
-	if res.ID != 4 {
-		t.Errorf("Response body should be `4`, was  %s", res.ID)
-	}
 	if res.Title != "My tasks" {
 		t.Errorf("Response body should be `My tasks`, was  %s", res.Title)
 	}
@@ -219,7 +216,7 @@ func TestCreateTodoListMissedFields(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/api/v1/list/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -235,7 +232,7 @@ func TestUpdateTodoList(t *testing.T) {
 
 	req, _ := http.NewRequest("PUT", "/api/v1/list/2/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -268,7 +265,7 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 
 	req, _ := http.NewRequest("PUT", "/api/v1/list/777/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -299,7 +296,7 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 func TestDeleteTodoList(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/list/2/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -313,7 +310,7 @@ func TestDeleteTodoList(t *testing.T) {
 func TestDeleteTodoListWrongID(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/list/777/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)

@@ -38,7 +38,7 @@ func CreateTodoFixtures(db *gorm.DB) {
 func TestGetTodos(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/1/todo/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -78,7 +78,7 @@ func TestGetTodos(t *testing.T) {
 func TestGetTodosNoTodos(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/3/todo/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -107,7 +107,7 @@ func TestGetTodosNoTodos(t *testing.T) {
 func TestGetTodosNonExistentList(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/777/todo/", nil)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -143,7 +143,7 @@ func TestGetTodo(t *testing.T) {
 		"GET", fmt.Sprintf("/api/v1/list/%d/todo/%d/", todo.TodoListID, todo.ID), nil,
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -185,7 +185,7 @@ func TestGetTodoWrongListID(t *testing.T) {
 		"GET", fmt.Sprintf("/api/v1/list/%d/todo/%d/", 3, todo.ID), nil,
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -221,7 +221,7 @@ func TestGetTodoWrongID(t *testing.T) {
 		"GET", fmt.Sprintf("/api/v1/list/%d/todo/%d/", todo.TodoListID, 777), nil,
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -257,7 +257,7 @@ func TestCreateTodo(t *testing.T) {
 		"POST", "/api/v1/list/1/todo/", bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -298,7 +298,7 @@ func TestCreateTodoNonExistentList(t *testing.T) {
 		"POST", "/api/v1/list/777/todo/", bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -337,7 +337,7 @@ func TestUpdateTodo(t *testing.T) {
 		bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -383,7 +383,7 @@ func TestUpdateTodoWrongListID(t *testing.T) {
 		bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -423,7 +423,7 @@ func TestUpdateTodoWrongID(t *testing.T) {
 		bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -463,7 +463,7 @@ func TestUpdateTodoWrongID1(t *testing.T) {
 		bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -501,7 +501,7 @@ func TestDeleteTodo(t *testing.T) {
 		nil,
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -522,7 +522,7 @@ func TestDeleteTodoWrongListID(t *testing.T) {
 		nil,
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -560,7 +560,7 @@ func TestDeleteTodoWrongID(t *testing.T) {
 		nil,
 	)
 
-	db := models.InitTestDb()
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)

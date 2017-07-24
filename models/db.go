@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/lib/pq"
 	"fmt"
 )
@@ -23,9 +22,14 @@ func InitDb(host, user, password, dbName string, debug bool) *gorm.DB {
 	return db
 }
 
-func InitTestDb() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./test_data.db")
-	db.LogMode(false)
+func InitTestDb(host, user, password, dbName string, debug bool) *gorm.DB {
+	connectionString := fmt.Sprintf(
+		"host=%s sslmode=disable user=%s password=%s dbname=%s_test", host, user, password, dbName,
+	)
+
+	db, err := gorm.Open("postgres", connectionString)
+
+	db.LogMode(debug)
 
 	if err != nil {
 		panic(err)
@@ -48,6 +52,6 @@ func CreateTables(db *gorm.DB) {
 }
 
 func DropTables(db *gorm.DB) {
-	db.DropTableIfExists(&TodoList{})
-	db.DropTableIfExists(&Todo{})
+	db.Delete(&TodoList{})
+	db.Delete(&Todo{})
 }
