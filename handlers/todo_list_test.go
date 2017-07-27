@@ -26,12 +26,6 @@ func CreateTodoListFixtures(db *gorm.DB) {
 	db.Create(&models.TodoList{ID: 3, Title: "Sport list"})
 }
 
-func checkResponseCode(t *testing.T, expected, actual int) {
-	if expected != actual {
-		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
-	}
-}
-
 func ExecuteRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
 
@@ -58,7 +52,9 @@ func TestGetTodoLists(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusOK, resp.Code)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
@@ -102,7 +98,9 @@ func TestGetTodoListsEmptyTable(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusOK, resp.Code)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
@@ -130,7 +128,9 @@ func TestGetTodoList(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusOK, resp.Code)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
@@ -161,7 +161,9 @@ func TestGetTodoListWrongID(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusNotFound, resp.Code)
+	if resp.Code != http.StatusNotFound {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusNotFound, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
@@ -194,7 +196,9 @@ func TestCreateTodoList(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusCreated, resp.Code)
+	if resp.Code != http.StatusCreated {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusCreated, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
@@ -224,7 +228,9 @@ func TestCreateTodoListMissedFields(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusBadRequest, resp.Code)
+	if resp.Code != http.StatusBadRequest {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusBadRequest, resp.Code)
+	}
 }
 
 func TestUpdateTodoList(t *testing.T) {
@@ -240,7 +246,9 @@ func TestUpdateTodoList(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusOK, resp.Code)
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
@@ -273,7 +281,9 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusNotFound, resp.Code)
+	if resp.Code != http.StatusNotFound {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusNotFound, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
@@ -304,7 +314,9 @@ func TestDeleteTodoList(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusNoContent, resp.Code)
+	if resp.Code != http.StatusNoContent {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusNoContent, resp.Code)
+	}
 }
 
 func TestDeleteTodoListWrongID(t *testing.T) {
@@ -318,7 +330,9 @@ func TestDeleteTodoListWrongID(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	checkResponseCode(t, http.StatusNotFound, resp.Code)
+	if resp.Code != http.StatusNotFound {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusNotFound, resp.Code)
+	}
 
 	bodyAsString := resp.Body.String()
 
