@@ -39,6 +39,10 @@ func InitTestDb(host, user, password, dbName string, debug bool) *gorm.DB {
 }
 
 func CreateTables(db *gorm.DB) {
+	if !db.HasTable(&User{}) {
+		db.CreateTable(&User{})
+	}
+
 	if !db.HasTable(&TodoList{}) {
 		db.CreateTable(&TodoList{})
 	}
@@ -52,6 +56,7 @@ func CreateTables(db *gorm.DB) {
 }
 
 func DropTables(db *gorm.DB) {
+	db.Delete(&User{})
 	db.Delete(&TodoList{})
 	db.Delete(&Todo{})
 }

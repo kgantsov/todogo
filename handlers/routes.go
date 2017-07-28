@@ -7,6 +7,14 @@ import (
 func DefineRoutes(r *gin.Engine) {
 	v1 := r.Group("api/v1")
 	{
+		v1.OPTIONS("/user/", OptionsUser)
+		v1.OPTIONS("/user/:userId/", OptionsUser)
+		v1.POST("/user/", CreateUser)
+		v1.GET("/user/", GetUsers)
+		v1.GET("/user/:userId/", GetUser)
+		v1.PUT("/user/:userId/", UpdateUser)
+		v1.DELETE("/user/:userId/", DeleteUser)
+
 		v1.OPTIONS("/list/", OptionsTodoList)
 		v1.OPTIONS("/list/:listId/", OptionsTodoList)
 		v1.POST("/list/", CreateTodoList)
