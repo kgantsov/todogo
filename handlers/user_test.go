@@ -10,12 +10,12 @@ import (
 )
 
 var users = []models.User{
-	{ID: 1, Name: "Mike", Email: "mike@gmail.com", Password: "111"},
-	{ID: 2, Name: "Ben", Email: "ben@gmail.com", Password: "111"},
-	{ID: 3, Name: "Kevin", Email: "kevin@gmail.com", Password: "111"},
-	{ID: 4, Name: "Tom", Email: "tom@gmail.com", Password: "111"},
-	{ID: 5, Name: "Oliver", Email: "oliver@gmail.com", Password: "111"},
-	{ID: 6, Name: "Pol", Email: "pol@gmail.com", Password: "111"},
+	{ID: 1, Name: "Mike", Email: "mike@gmail.com", FacebookID: "111"},
+	{ID: 2, Name: "Ben", Email: "ben@gmail.com", FacebookID: "111"},
+	{ID: 3, Name: "Kevin", Email: "kevin@gmail.com", FacebookID: "111"},
+	{ID: 4, Name: "Tom", Email: "tom@gmail.com", FacebookID: "111"},
+	{ID: 5, Name: "Oliver", Email: "oliver@gmail.com", FacebookID: "111"},
+	{ID: 6, Name: "Pol", Email: "pol@gmail.com", FacebookID: "111"},
 }
 
 func CreateUserFixtures(db *gorm.DB) {
@@ -59,8 +59,8 @@ func TestGetUsers(t *testing.T) {
 		if res[i].Email != users[i].Email {
 			t.Errorf("Response body should be `%s`, was  %s", users[i].Email, res[i].Email)
 		}
-		if res[i].Password != users[i].Password {
-			t.Errorf("Response body should be `%s`, was  %s", users[i].Password, res[i].Password)
+		if res[i].FacebookID != users[i].FacebookID {
+			t.Errorf("Response body should be `%s`, was  %s", users[i].FacebookID, res[i].FacebookID)
 		}
 	}
 }
@@ -130,8 +130,8 @@ func TestGetUser(t *testing.T) {
 	if res.Email != user.Email {
 		t.Errorf("Response body should be `%s`, was  %s", user.Email, res.Email)
 	}
-	if res.Password != user.Password {
-		t.Errorf("Response body should be `%s`, was  %s", user.Password, res.Password)
+	if res.FacebookID != user.FacebookID {
+		t.Errorf("Response body should be `%s`, was  %s", user.FacebookID, res.FacebookID)
 	}
 }
 
@@ -169,7 +169,7 @@ func TestGetUserWrongID(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	var jsonStr = []byte(`{"name": "Petr", "email": "petr@gmail.com", "password": "222"}`)
+	var jsonStr = []byte(`{"name": "Petr", "email": "petr@gmail.com", "facebook_id": "222"}`)
 
 	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
 
@@ -201,8 +201,8 @@ func TestCreateUser(t *testing.T) {
 	if res.Email != "petr@gmail.com" {
 		t.Errorf("Response body should be `petr@gmail.com`, was  %s", res.Email)
 	}
-	if res.Password != "222" {
-		t.Errorf("Response body should be `222`, was  %s", res.Password)
+	if res.FacebookID != "222" {
+		t.Errorf("Response body should be `222`, was  %s", res.FacebookID)
 	}
 }
 
@@ -225,7 +225,7 @@ func TestCreateUserMissedFields(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
+	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "facebook_id": "444"}`)
 
 	req, _ := http.NewRequest("PUT", "/api/v1/user/2/", bytes.NewBuffer(jsonStr))
 
@@ -260,13 +260,13 @@ func TestUpdateUser(t *testing.T) {
 	if res.Email != "tim@gmail.com" {
 		t.Errorf("Response body should be `%s`, was  %s", "tim@gmail.com", res.Email)
 	}
-	if res.Password != "444" {
-		t.Errorf("Response body should be `%s`, was  %s", "444", res.Password)
+	if res.FacebookID != "444" {
+		t.Errorf("Response body should be `%s`, was  %s", "444", res.FacebookID)
 	}
 }
 
 func TestUpdateUserWrongID(t *testing.T) {
-	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
+	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "facebook_id": "444"}`)
 
 	req, _ := http.NewRequest("PUT", "/api/v1/user/777/", bytes.NewBuffer(jsonStr))
 

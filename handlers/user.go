@@ -83,12 +83,12 @@ func UpdateUser(c *gin.Context) {
 
 	if user.ID != 0 {
 		user = models.User{
-			ID:        user.ID,
-			Name:      newUser.Name,
-			Email:     newUser.Email,
-			Password:  newUser.Password,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: time.Now(),
+			ID:         user.ID,
+			Name:       newUser.Name,
+			Email:      newUser.Email,
+			FacebookID: newUser.FacebookID,
+			CreatedAt:  user.CreatedAt,
+			UpdatedAt:  time.Now(),
 		}
 
 		db.Save(&user)
