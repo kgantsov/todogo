@@ -34,7 +34,7 @@ func ExecuteRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
 
 	r.Use(DBMiddleware(*db))
 
-	DefineRoutes(r)
+	DefineRoutes(db, r)
 
 	r.ServeHTTP(w, req)
 
@@ -43,11 +43,14 @@ func ExecuteRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
 
 func TestGetTodoLists(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -90,11 +93,14 @@ func TestGetTodoLists(t *testing.T) {
 
 func TestGetTodoListsEmptyTable(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 
 	resp := ExecuteRequest(db, req)
 
@@ -117,13 +123,66 @@ func TestGetTodoListsEmptyTable(t *testing.T) {
 	}
 }
 
-func TestGetTodoList(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/v1/list/2/", nil)
+func TestGetTodoListsNoAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/list/", nil)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
+func TestGetTodoListsAuthUserDoesNotExist(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/list/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
+func TestGetTodoListsWrongAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/list/", nil)
+	req.Header.Set("Auth-Token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MDE0NDg3MDr")
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
+func TestGetTodoList(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/list/2/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -152,11 +211,14 @@ func TestGetTodoList(t *testing.T) {
 
 func TestGetTodoListWrongID(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/list/777/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -183,15 +245,35 @@ func TestGetTodoListWrongID(t *testing.T) {
 	}
 }
 
-func TestCreateTodoList(t *testing.T) {
-	var jsonStr = []byte(`{"title": "My tasks"}`)
-
-	req, _ := http.NewRequest("POST", "/api/v1/list/", bytes.NewBuffer(jsonStr))
+func TestGetTodoListNoAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/list/2/", nil)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
+func TestCreateTodoList(t *testing.T) {
+	var jsonStr = []byte(`{"title": "My tasks"}`)
+
+	req, _ := http.NewRequest("POST", "/api/v1/list/", bytes.NewBuffer(jsonStr))
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -219,11 +301,14 @@ func TestCreateTodoListMissedFields(t *testing.T) {
 	var jsonStr = []byte(`{}`)
 
 	req, _ := http.NewRequest("POST", "/api/v1/list/", bytes.NewBuffer(jsonStr))
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -237,11 +322,14 @@ func TestUpdateTodoList(t *testing.T) {
 	var jsonStr = []byte(`{"title": "My tasks"}`)
 
 	req, _ := http.NewRequest("PUT", "/api/v1/list/2/", bytes.NewBuffer(jsonStr))
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -272,11 +360,14 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 	var jsonStr = []byte(`{"title": "My tasks"}`)
 
 	req, _ := http.NewRequest("PUT", "/api/v1/list/777/", bytes.NewBuffer(jsonStr))
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -305,11 +396,14 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 
 func TestDeleteTodoList(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/list/2/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)
@@ -321,11 +415,14 @@ func TestDeleteTodoList(t *testing.T) {
 
 func TestDeleteTodoListWrongID(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/list/777/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
+	CreateUserFixtures(db)
 	CreateTodoListFixtures(db)
 
 	resp := ExecuteRequest(db, req)

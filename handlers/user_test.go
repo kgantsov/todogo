@@ -10,12 +10,12 @@ import (
 )
 
 var users = []models.User{
-	{ID: 1, Name: "Mike", Email: "mike@gmail.com", FacebookID: "111"},
-	{ID: 2, Name: "Ben", Email: "ben@gmail.com", FacebookID: "111"},
-	{ID: 3, Name: "Kevin", Email: "kevin@gmail.com", FacebookID: "111"},
-	{ID: 4, Name: "Tom", Email: "tom@gmail.com", FacebookID: "111"},
-	{ID: 5, Name: "Oliver", Email: "oliver@gmail.com", FacebookID: "111"},
-	{ID: 6, Name: "Pol", Email: "pol@gmail.com", FacebookID: "111"},
+	{ID: 1, Name: "Mike", Email: "mike@gmail.com", Password: "111"},
+	{ID: 2, Name: "Ben", Email: "ben@gmail.com", Password: "111"},
+	{ID: 3, Name: "Kevin", Email: "kevin@gmail.com", Password: "111"},
+	{ID: 4, Name: "Tom", Email: "tom@gmail.com", Password: "111"},
+	{ID: 5, Name: "Oliver", Email: "oliver@gmail.com", Password: "111"},
+	{ID: 6, Name: "Pol", Email: "pol@gmail.com", Password: "111"},
 }
 
 func CreateUserFixtures(db *gorm.DB) {
@@ -26,6 +26,8 @@ func CreateUserFixtures(db *gorm.DB) {
 
 func TestGetUsers(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/user/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
@@ -59,14 +61,16 @@ func TestGetUsers(t *testing.T) {
 		if res[i].Email != users[i].Email {
 			t.Errorf("Response body should be `%s`, was  %s", users[i].Email, res[i].Email)
 		}
-		if res[i].FacebookID != users[i].FacebookID {
-			t.Errorf("Response body should be `%s`, was  %s", users[i].FacebookID, res[i].FacebookID)
+		if res[i].Password != users[i].Password {
+			t.Errorf("Response body should be `%s`, was  %s", users[i].Password, res[i].Password)
 		}
 	}
 }
 
 func TestGetUsersEmptyTable(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/user/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
@@ -75,22 +79,8 @@ func TestGetUsersEmptyTable(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	if resp.Code != http.StatusOK {
-		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
-	}
-
-	bodyAsString := resp.Body.String()
-
-	var res []models.User
-
-	err := json.Unmarshal([]byte(bodyAsString), &res)
-	if err != nil {
-		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if len(res) != 0 {
-		t.Errorf("Response body should be empty, was  %v", res)
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }
 
@@ -98,6 +88,8 @@ func TestGetUser(t *testing.T) {
 	user := users[1]
 
 	req, _ := http.NewRequest("GET", "/api/v1/user/2/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
@@ -130,13 +122,15 @@ func TestGetUser(t *testing.T) {
 	if res.Email != user.Email {
 		t.Errorf("Response body should be `%s`, was  %s", user.Email, res.Email)
 	}
-	if res.FacebookID != user.FacebookID {
-		t.Errorf("Response body should be `%s`, was  %s", user.FacebookID, res.FacebookID)
+	if res.Password != user.Password {
+		t.Errorf("Response body should be `%s`, was  %s", user.Password, res.Password)
 	}
 }
 
 func TestGetUserWrongID(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/user/777/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
@@ -169,7 +163,7 @@ func TestGetUserWrongID(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	var jsonStr = []byte(`{"name": "Petr", "email": "petr@gmail.com", "facebook_id": "222"}`)
+	var jsonStr = []byte(`{"name": "Petr", "email": "petr@gmail.com", "password": "222"}`)
 
 	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
 
@@ -201,8 +195,8 @@ func TestCreateUser(t *testing.T) {
 	if res.Email != "petr@gmail.com" {
 		t.Errorf("Response body should be `petr@gmail.com`, was  %s", res.Email)
 	}
-	if res.FacebookID != "222" {
-		t.Errorf("Response body should be `222`, was  %s", res.FacebookID)
+	if res.Password != hashPassword("222") {
+		t.Errorf("Response body should be `%s`, was  %s", hashPassword("222"), res.Password)
 	}
 }
 
@@ -225,9 +219,11 @@ func TestCreateUserMissedFields(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "facebook_id": "444"}`)
+	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
 	req, _ := http.NewRequest("PUT", "/api/v1/user/2/", bytes.NewBuffer(jsonStr))
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
@@ -260,15 +256,17 @@ func TestUpdateUser(t *testing.T) {
 	if res.Email != "tim@gmail.com" {
 		t.Errorf("Response body should be `%s`, was  %s", "tim@gmail.com", res.Email)
 	}
-	if res.FacebookID != "444" {
-		t.Errorf("Response body should be `%s`, was  %s", "444", res.FacebookID)
+	if res.Password != hashPassword("444") {
+		t.Errorf("Response body should be `%s`, was  %s", hashPassword("444"), res.Password)
 	}
 }
 
 func TestUpdateUserWrongID(t *testing.T) {
-	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "facebook_id": "444"}`)
+	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
 	req, _ := http.NewRequest("PUT", "/api/v1/user/777/", bytes.NewBuffer(jsonStr))
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
@@ -302,6 +300,8 @@ func TestUpdateUserWrongID(t *testing.T) {
 
 func TestDeleteUser(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/user/2/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 
@@ -318,6 +318,8 @@ func TestDeleteUser(t *testing.T) {
 
 func TestDeleteUserWrongID(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/user/777/", nil)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
 

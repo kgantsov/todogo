@@ -52,6 +52,6 @@ func main() {
 
 	r.Use(DBMiddleware(*db))
 
-	handlers.DefineRoutes(r)
+	handlers.DefineRoutes(db, r)
 	r.Run(fmt.Sprintf(":%d", *port))
 }

@@ -1,11 +1,18 @@
 package handlers
 
 import (
+	"time"
+	"crypto/sha256"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
-	"time"
 )
+
+func hashPassword(password string) string {
+	password_hash := sha256.Sum256([]byte(password))
+	return fmt.Sprintf("%x", password_hash)
+}
 
 func OptionsUser(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "DELETE,POST,PUT")
@@ -23,6 +30,8 @@ func CreateUser(c *gin.Context) {
 	e := c.BindJSON(&user)
 
 	if e == nil {
+		user.Password = hashPassword(user.Password)
+
 		db.Create(&user)
 		c.JSON(201, user)
 	} else {
@@ -83,12 +92,12 @@ func UpdateUser(c *gin.Context) {
 
 	if user.ID != 0 {
 		user = models.User{
-			ID:         user.ID,
-			Name:       newUser.Name,
-			Email:      newUser.Email,
-			FacebookID: newUser.FacebookID,
-			CreatedAt:  user.CreatedAt,
-			UpdatedAt:  time.Now(),
+			ID:        user.ID,
+			Name:      newUser.Name,
+			Email:     newUser.Email,
+			Password:  hashPassword(newUser.Password),
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: time.Now(),
 		}
 
 		db.Save(&user)
