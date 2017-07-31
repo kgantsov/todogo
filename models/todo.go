@@ -12,4 +12,5 @@ type Todo struct {
 	Completed  bool      `gorm:"not null" form:"completed" json:"completed"`
 	Note       string    `gorm:"not null" form:"note" json:"note"`
 	TodoListID uint      `gorm:"index" form:"todo_list_id" json:"todo_list_id"`
+	UserID     uint      `gorm:"index" form:"user_id" json:"user_id"`
 }

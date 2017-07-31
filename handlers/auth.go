@@ -18,7 +18,7 @@ type LoginForm struct {
 
 func OptionsLogin(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "DELETE,POST,PUT")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type,Auth-Token")
 	c.Next()
 }
 

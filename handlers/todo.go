@@ -10,7 +10,7 @@ import (
 
 func OptionsTodo(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "DELETE,POST,PUT")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type,Auth-Token")
 	c.Next()
 }
 
@@ -24,7 +24,9 @@ func CreateTodo(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
 	if todoList.ID == 0 {
 		c.JSON(404, gin.H{"error": "TODO list not found"})
@@ -34,7 +36,10 @@ func CreateTodo(c *gin.Context) {
 	e := c.BindJSON(&todo)
 
 	if e == nil {
+		currentUser := c.MustGet("CurrentUser").(models.User)
+		todo.UserID = currentUser.ID
 		todo.TodoListID = uint(listId)
+
 		db.Create(&todo)
 		c.JSON(201, todo)
 	} else {
@@ -52,7 +57,9 @@ func GetTodos(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
 	if todoList.ID == 0 {
 		c.JSON(404, gin.H{"error": "TODO list not found"})
@@ -60,7 +67,7 @@ func GetTodos(c *gin.Context) {
 
 	var todos []models.Todo
 
-	db.Order("id asc").Where("todo_list_id = ?", listId).Find(&todos)
+	db.Order("id asc").Where("user_id = ? AND todo_list_id = ?", currentUser.ID, listId).Find(&todos)
 
 	c.JSON(200, todos)
 }
@@ -76,7 +83,9 @@ func GetTodo(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
 	if todoList.ID == 0 {
 		c.JSON(404, gin.H{"error": "TODO list not found"})
@@ -84,7 +93,7 @@ func GetTodo(c *gin.Context) {
 
 	var todo models.Todo
 
-	db.Where("todo_list_id = ? and id = ?", listId, todoId).Find(&todo)
+	db.Where("user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId).Find(&todo)
 
 	if todo.ID != 0 {
 		c.JSON(200, todo)
@@ -111,7 +120,9 @@ func UpdateTodo(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
 	if todoList.ID == 0 {
 		c.JSON(404, gin.H{"error": "TODO list not found"})
@@ -119,7 +130,7 @@ func UpdateTodo(c *gin.Context) {
 
 	var todo models.Todo
 
-	db.Where("todo_list_id = ? and id = ?", listId, todoId).Find(&todo)
+	db.Where("user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId).Find(&todo)
 
 	if todo.ID != 0 {
 		todo = models.Todo{
@@ -128,6 +139,7 @@ func UpdateTodo(c *gin.Context) {
 			Completed:  newTodo.Completed,
 			Note:       newTodo.Note,
 			TodoListID: uint(listId),
+			UserID:     todo.UserID,
 			CreatedAt:  todo.CreatedAt,
 			UpdatedAt:  time.Now(),
 		}
@@ -150,7 +162,9 @@ func DeleteTodo(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
 	if todoList.ID == 0 {
 		c.JSON(404, gin.H{"error": "TODO list not found"})
@@ -158,7 +172,7 @@ func DeleteTodo(c *gin.Context) {
 
 	var todo models.Todo
 
-	db.Where("todo_list_id = ? and id = ?", listId, todoId).Find(&todo)
+	db.Where("user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId).Find(&todo)
 
 	if todo.ID != 0 {
 		db.Delete(&todo)

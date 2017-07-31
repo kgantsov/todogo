@@ -9,7 +9,7 @@ import (
 
 func OptionsTodoList(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "DELETE,POST,PUT")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type,Auth-Token")
 	c.Next()
 }
 
@@ -23,6 +23,9 @@ func CreateTodoList(c *gin.Context) {
 	e := c.BindJSON(&todoList)
 
 	if e == nil {
+		currentUser := c.MustGet("CurrentUser").(models.User)
+		todoList.UserID = currentUser.ID
+
 		db.Create(&todoList)
 		c.JSON(201, todoList)
 	} else {
@@ -38,7 +41,9 @@ func GetTodoLists(c *gin.Context) {
 
 	var todoLists []models.TodoList
 
-	db.Order("id asc").Find(&todoLists)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Order("id asc").Where("user_id = ?", currentUser.ID).Find(&todoLists)
 
 	c.JSON(200, todoLists)
 }
@@ -53,7 +58,9 @@ func GetTodoList(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("id = ? AND user_id = ?", listId, currentUser.ID).First(&todoList)
 
 	if todoList.ID != 0 {
 		c.JSON(200, todoList)
@@ -79,7 +86,9 @@ func UpdateTodoList(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("id = ? AND user_id = ?", listId, currentUser.ID).First(&todoList)
 
 	if todoList.ID != 0 {
 		todoList = models.TodoList{
@@ -107,7 +116,9 @@ func DeleteTodoList(c *gin.Context) {
 
 	var todoList models.TodoList
 
-	db.First(&todoList, listId)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Where("id = ? AND user_id = ?", listId, currentUser.ID).First(&todoList)
 
 	if todoList.ID != 0 {
 		db.Delete(&todoList)

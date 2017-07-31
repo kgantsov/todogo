@@ -11,19 +11,19 @@ import (
 )
 
 var shoppingTodos = []models.Todo{
-	{ID: 1, Title: "Milk", Completed: true, Note: "Milk", TodoListID: 1},
-	{ID: 2, Title: "Bread", Completed: false, Note: "Bread", TodoListID: 1},
-	{ID: 3, Title: "Cucumber", Completed: true, Note: "Cucumber", TodoListID: 1},
-	{ID: 4, Title: "Tomato", Completed: false, Note: "Tomato", TodoListID: 1},
-	{ID: 5, Title: "Oil", Completed: false, Note: "Oil", TodoListID: 1},
-	{ID: 6, Title: "Potato", Completed: false, Note: "Potato", TodoListID: 1},
-	{ID: 7, Title: "Ice cream", Completed: true, Note: "Ice cream", TodoListID: 1},
+	{ID: 1, Title: "Milk", Completed: true, Note: "Milk", TodoListID: 1, UserID: users[0].ID},
+	{ID: 2, Title: "Bread", Completed: false, Note: "Bread", TodoListID: 1, UserID: users[0].ID},
+	{ID: 3, Title: "Cucumber", Completed: true, Note: "Cucumber", TodoListID: 1, UserID: users[0].ID},
+	{ID: 4, Title: "Tomato", Completed: false, Note: "Tomato", TodoListID: 1, UserID: users[0].ID},
+	{ID: 5, Title: "Oil", Completed: false, Note: "Oil", TodoListID: 1, UserID: users[0].ID},
+	{ID: 6, Title: "Potato", Completed: false, Note: "Potato", TodoListID: 1, UserID: users[0].ID},
+	{ID: 7, Title: "Ice cream", Completed: true, Note: "Ice cream", TodoListID: 1, UserID: users[0].ID},
 }
 var workTodos = []models.Todo{
-	{ID: 8, Title: "Write some tests for todo list", Completed: true, Note: "", TodoListID: 2},
-	{ID: 9, Title: "Write some tests for todo", Completed: false, Note: "", TodoListID: 2},
-	{ID: 10, Title: "Implement authentication", Completed: false, Note: "", TodoListID: 2},
-	{ID: 11, Title: "Implement frontend in clojure script", Completed: false, Note: "", TodoListID: 2},
+	{ID: 8, Title: "Write some tests for todo list", Completed: true, Note: "", TodoListID: 2, UserID: users[0].ID},
+	{ID: 9, Title: "Write some tests for todo", Completed: false, Note: "", TodoListID: 2, UserID: users[0].ID},
+	{ID: 10, Title: "Implement authentication", Completed: false, Note: "", TodoListID: 2, UserID: users[0].ID},
+	{ID: 11, Title: "Implement frontend in clojure script", Completed: false, Note: "", TodoListID: 2, UserID: users[0].ID},
 }
 
 func CreateTodoFixtures(db *gorm.DB) {

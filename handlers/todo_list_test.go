@@ -21,9 +21,12 @@ func DBMiddleware(db gorm.DB) gin.HandlerFunc {
 }
 
 func CreateTodoListFixtures(db *gorm.DB) {
-	db.Create(&models.TodoList{ID: 1, Title: "Shopping list"})
-	db.Create(&models.TodoList{ID: 2, Title: "Work list"})
-	db.Create(&models.TodoList{ID: 3, Title: "Sport list"})
+	db.Create(&models.TodoList{ID: 1, Title: "Shopping list", UserID: users[0].ID})
+	db.Create(&models.TodoList{ID: 2, Title: "Work list", UserID: users[0].ID})
+	db.Create(&models.TodoList{ID: 3, Title: "Sport list", UserID: users[0].ID})
+	db.Create(&models.TodoList{ID: 4, Title: "Todo project", UserID: users[1].ID})
+	db.Create(&models.TodoList{ID: 5, Title: "Foogle project", UserID: users[1].ID})
+	db.Create(&models.TodoList{ID: 6, Title: "Sport list", UserID: users[2].ID})
 }
 
 func ExecuteRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
@@ -67,6 +70,10 @@ func TestGetTodoLists(t *testing.T) {
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	if len(res) != 3 {
+		t.Errorf("Response body should be `3`, was  %s", len(res))
 	}
 
 	if res[0].ID != 1 {
