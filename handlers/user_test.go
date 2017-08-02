@@ -84,6 +84,21 @@ func TestGetUsersEmptyTable(t *testing.T) {
 	}
 }
 
+func TestGetUsersEmptyTableNoAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/user/", nil)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
 func TestGetUser(t *testing.T) {
 	user := users[1]
 
@@ -159,6 +174,23 @@ func TestGetUserWrongID(t *testing.T) {
 			"Expected the 'error' key of the response to be set to 'User not found'. Got '%s'",
 			res["error"],
 		)
+	}
+}
+
+
+func TestGetUserNoAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/user/777/", nil)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }
 
@@ -298,6 +330,24 @@ func TestUpdateUserWrongID(t *testing.T) {
 	}
 }
 
+func TestUpdateUserNoAuthToken(t *testing.T) {
+	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
+
+	req, _ := http.NewRequest("PUT", "/api/v1/user/777/", bytes.NewBuffer(jsonStr))
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
 func TestDeleteUser(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/user/2/", nil)
 	token, _ := createToken(users[0].ID)
@@ -348,5 +398,21 @@ func TestDeleteUserWrongID(t *testing.T) {
 			"Expected the 'error' key of the response to be set to 'User not found'. Got '%s'",
 			res["error"],
 		)
+	}
+}
+
+func TestDeleteUserNoAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("DELETE", "/api/v1/user/777/", nil)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }

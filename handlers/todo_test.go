@@ -151,6 +151,24 @@ func TestGetTodosNonExistentList(t *testing.T) {
 	}
 }
 
+func TestGetTodosNoAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("GET", "/api/v1/list/1/todo/", nil)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+	CreateTodoFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
 func TestGetTodo(t *testing.T) {
 	todo := shoppingTodos[2]
 
@@ -280,6 +298,29 @@ func TestGetTodoWrongID(t *testing.T) {
 	}
 }
 
+
+func TestGetTodoNoAuthToken(t *testing.T) {
+	todo := shoppingTodos[2]
+
+	req, _ := http.NewRequest(
+		"GET", fmt.Sprintf("/api/v1/list/%d/todo/%d/", todo.TodoListID, todo.ID), nil,
+	)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+	CreateTodoFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
 func TestCreateTodo(t *testing.T) {
 	var jsonStr = []byte(`{"title": "Milk", "completed": true, "note": "1.5 L 1.5%"}`)
 
@@ -363,6 +404,27 @@ func TestCreateTodoNonExistentList(t *testing.T) {
 			"Expected the 'error' key of the response to be set to 'Todo List not found'. Got '%s'",
 			res["error"],
 		)
+	}
+}
+
+func TestCreateTodoNoAuthToken(t *testing.T) {
+	var jsonStr = []byte(`{"title": "Milk", "completed": true, "note": "1.5 L 1.5%"}`)
+
+	req, _ := http.NewRequest(
+		"POST", "/api/v1/list/1/todo/", bytes.NewBuffer(jsonStr),
+	)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }
 
@@ -504,6 +566,32 @@ func TestUpdateTodoWrongID(t *testing.T) {
 			"Expected the 'error' key of the response to be set to 'Todo not found'. Got '%s'",
 			res["error"],
 		)
+	}
+}
+
+func TestUpdateTodoNoAuthToken(t *testing.T) {
+	var jsonStr = []byte(`{"title": "Milk", "completed": true, "note": "1.5 L 1.5%"}`)
+
+	todo := shoppingTodos[2]
+
+	req, _ := http.NewRequest(
+		"PUT",
+		fmt.Sprintf("/api/v1/list/%d/todo/%d/", todo.TodoListID, todo.ID),
+		bytes.NewBuffer(jsonStr),
+	)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+	CreateTodoFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }
 
@@ -661,5 +749,29 @@ func TestDeleteTodoWrongID(t *testing.T) {
 			"Expected the 'error' key of the response to be set to 'Todo not found'. Got '%s'",
 			res["error"],
 		)
+	}
+}
+
+func TestDeleteTodoNoAuthToken(t *testing.T) {
+	todo := shoppingTodos[2]
+
+	req, _ := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("/api/v1/list/%d/todo/%d/", todo.TodoListID, todo.ID),
+		nil,
+	)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+	CreateTodoFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }

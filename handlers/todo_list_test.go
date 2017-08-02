@@ -325,6 +325,25 @@ func TestCreateTodoListMissedFields(t *testing.T) {
 	}
 }
 
+func TestCreateTodoListNoAuthToken(t *testing.T) {
+	var jsonStr = []byte(`{}`)
+
+	req, _ := http.NewRequest("POST", "/api/v1/list/", bytes.NewBuffer(jsonStr))
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
 func TestUpdateTodoList(t *testing.T) {
 	var jsonStr = []byte(`{"title": "My tasks"}`)
 
@@ -401,6 +420,25 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 	}
 }
 
+func TestUpdateTodoListNoAuthToken(t *testing.T) {
+	var jsonStr = []byte(`{"title": "My tasks"}`)
+
+	req, _ := http.NewRequest("PUT", "/api/v1/list/777/", bytes.NewBuffer(jsonStr))
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
 func TestDeleteTodoList(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/list/2/", nil)
 	token, _ := createToken(users[0].ID)
@@ -453,5 +491,22 @@ func TestDeleteTodoListWrongID(t *testing.T) {
 			"Expected the 'error' key of the response to be set to 'Todo List not found'. Got '%s'",
 			res["error"],
 		)
+	}
+}
+
+func TestDeleteTodoListNoAuthToken(t *testing.T) {
+	req, _ := http.NewRequest("DELETE", "/api/v1/list/777/", nil)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }
