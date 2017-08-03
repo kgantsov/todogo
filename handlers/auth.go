@@ -75,7 +75,7 @@ func validateToken(db *gorm.DB, tokenString string) (models.User, bool) {
 
 	if err == nil {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			db.First(&user, claims["user_id"])
+			db.Where("id = ?", claims["user_id"]).First(&user)
 
 			if user.ID != 0 {
 				return user, true

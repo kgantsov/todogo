@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
+	"strconv"
 )
 
 func hashPassword(password string) string {
@@ -47,7 +48,9 @@ func GetUsers(c *gin.Context) {
 
 	var users []models.User
 
-	db.Order("id asc").Find(&users)
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	db.Order("id asc").Where("id = ?", currentUser.ID).Find(&users)
 
 	c.JSON(200, users)
 }
@@ -58,7 +61,13 @@ func GetUser(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
 	}
 
-	userId := c.Params.ByName("userId")
+	userId, _ := strconv.ParseUint(c.Params.ByName("userId"), 0, 64)
+
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	if uint(userId) != currentUser.ID {
+		c.JSON(403, gin.H{"error": "Access denied"})
+	}
 
 	var user models.User
 
@@ -77,7 +86,13 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
 	}
 
-	userId := c.Params.ByName("userId")
+	userId, _ := strconv.ParseUint(c.Params.ByName("userId"), 0, 64)
+
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	if uint(userId) != currentUser.ID {
+		c.JSON(403, gin.H{"error": "Access denied"})
+	}
 
 	var newUser models.User
 	e := c.BindJSON(&newUser)
@@ -114,7 +129,13 @@ func DeleteUser(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
 	}
 
-	userId := c.Params.ByName("userId")
+	userId, _ := strconv.ParseUint(c.Params.ByName("userId"), 0, 64)
+
+	currentUser := c.MustGet("CurrentUser").(models.User)
+
+	if uint(userId) != currentUser.ID {
+		c.JSON(403, gin.H{"error": "Access denied"})
+	}
 
 	var user models.User
 

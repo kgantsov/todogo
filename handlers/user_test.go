@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 	"github.com/jinzhu/gorm"
+	"fmt"
 )
 
 var users = []models.User{
@@ -51,19 +52,17 @@ func TestGetUsers(t *testing.T) {
 		return
 	}
 
-	for i := range users {
-		if res[i].ID != users[i].ID {
-			t.Errorf("Response body should be `%s`, was  %s", users[i].ID, res[i].ID)
-		}
-		if res[i].Name != users[i].Name {
-			t.Errorf("Response body should be `%s`, was  %s", users[i].Name, res[i].Name)
-		}
-		if res[i].Email != users[i].Email {
-			t.Errorf("Response body should be `%s`, was  %s", users[i].Email, res[i].Email)
-		}
-		if res[i].Password != users[i].Password {
-			t.Errorf("Response body should be `%s`, was  %s", users[i].Password, res[i].Password)
-		}
+	if res[0].ID != users[0].ID {
+		t.Errorf("Response body should be `%s`, was  %s", users[0].ID, res[0].ID)
+	}
+	if res[0].Name != users[0].Name {
+		t.Errorf("Response body should be `%s`, was  %s", users[0].Name, res[0].Name)
+	}
+	if res[0].Email != users[0].Email {
+		t.Errorf("Response body should be `%s`, was  %s", users[0].Email, res[0].Email)
+	}
+	if res[0].Password != users[0].Password {
+		t.Errorf("Response body should be `%s`, was  %s", users[0].Password, res[0].Password)
 	}
 }
 
@@ -100,10 +99,10 @@ func TestGetUsersEmptyTableNoAuthToken(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	user := users[1]
+	user := users[2]
 
-	req, _ := http.NewRequest("GET", "/api/v1/user/2/", nil)
-	token, _ := createToken(users[0].ID)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/api/v1/user/%d/", user.ID), nil)
+	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
@@ -143,7 +142,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestGetUserWrongID(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/v1/user/777/", nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), nil)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -155,8 +154,8 @@ func TestGetUserWrongID(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	if resp.Code != http.StatusNotFound {
-		t.Errorf("Expected response code %d. Got %d\n", http.StatusNotFound, resp.Code)
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 
 	bodyAsString := resp.Body.String()
@@ -169,9 +168,9 @@ func TestGetUserWrongID(t *testing.T) {
 		return
 	}
 
-	if res["error"] != "User not found" {
+	if res["error"] != "Access denied" {
 		t.Errorf(
-			"Expected the 'error' key of the response to be set to 'User not found'. Got '%s'",
+			"Expected the 'error' key of the response to be set to 'Access denied'. Got '%s'",
 			res["error"],
 		)
 	}
@@ -251,10 +250,11 @@ func TestCreateUserMissedFields(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+	user := users[2]
 	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
-	req, _ := http.NewRequest("PUT", "/api/v1/user/2/", bytes.NewBuffer(jsonStr))
-	token, _ := createToken(users[0].ID)
+	req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/user/%d/", user.ID), bytes.NewBuffer(jsonStr))
+	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
@@ -279,8 +279,8 @@ func TestUpdateUser(t *testing.T) {
 		return
 	}
 
-	if res.ID != 2 {
-		t.Errorf("Response body should be `%s`, was  %s", 2, res.ID)
+	if res.ID != user.ID {
+		t.Errorf("Response body should be `%s`, was  %s", user.ID, res.ID)
 	}
 	if res.Name != "Tim" {
 		t.Errorf("Response body should be `%s`, was  %s", "Tim", res.Name)
@@ -296,7 +296,7 @@ func TestUpdateUser(t *testing.T) {
 func TestUpdateUserWrongID(t *testing.T) {
 	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
-	req, _ := http.NewRequest("PUT", "/api/v1/user/777/", bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), bytes.NewBuffer(jsonStr))
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -308,8 +308,8 @@ func TestUpdateUserWrongID(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	if resp.Code != http.StatusNotFound {
-		t.Errorf("Expected response code %d. Got %d\n", http.StatusNotFound, resp.Code)
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 
 	bodyAsString := resp.Body.String()
@@ -322,9 +322,9 @@ func TestUpdateUserWrongID(t *testing.T) {
 		return
 	}
 
-	if res["error"] != "User not found" {
+	if res["error"] != "Access denied" {
 		t.Errorf(
-			"Expected the 'error' key of the response to be set to 'User not found'. Got '%s'",
+			"Expected the 'error' key of the response to be set to 'Access denied'. Got '%s'",
 			res["error"],
 		)
 	}
@@ -349,8 +349,9 @@ func TestUpdateUserNoAuthToken(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", "/api/v1/user/2/", nil)
-	token, _ := createToken(users[0].ID)
+	user := users[2]
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/user/%d/", user.ID), nil)
+	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
@@ -367,7 +368,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestDeleteUserWrongID(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", "/api/v1/user/777/", nil)
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), nil)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -379,8 +380,8 @@ func TestDeleteUserWrongID(t *testing.T) {
 
 	resp := ExecuteRequest(db, req)
 
-	if resp.Code != http.StatusNotFound {
-		t.Errorf("Expected response code %d. Got %d\n", http.StatusNotFound, resp.Code)
+	if resp.Code != http.StatusForbidden {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 
 	bodyAsString := resp.Body.String()
@@ -393,9 +394,9 @@ func TestDeleteUserWrongID(t *testing.T) {
 		return
 	}
 
-	if res["error"] != "User not found" {
+	if res["error"] != "Access denied" {
 		t.Errorf(
-			"Expected the 'error' key of the response to be set to 'User not found'. Got '%s'",
+			"Expected the 'error' key of the response to be set to 'Access denied'. Got '%s'",
 			res["error"],
 		)
 	}
