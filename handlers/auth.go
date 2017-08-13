@@ -32,7 +32,7 @@ func Login(c *gin.Context) {
 	e := c.BindJSON(&loginForm)
 
 	if e != nil {
-		c.JSON(403, gin.H{"error": e})
+		c.JSON(401, gin.H{"error": e})
 	}
 
 	var user models.User
@@ -48,7 +48,7 @@ func Login(c *gin.Context) {
 			}
 		}
 	}
-	c.JSON(403, gin.H{"error": "Login or password is incorrect"})
+	c.JSON(401, gin.H{"error": "Login or password is incorrect"})
 }
 
 func createToken(userId uint) (string, error) {
