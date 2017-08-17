@@ -231,6 +231,41 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
+func TestCreateUserExisingEmail(t *testing.T) {
+	var jsonStr = []byte(`{"name": "Mike", "email": "mike@gmail.com", "password": "222"}`)
+
+	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusConflict {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusConflict, resp.Code)
+	}
+
+	bodyAsString := resp.Body.String()
+
+	var res map[string]string
+
+	err := json.Unmarshal([]byte(bodyAsString), &res)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if res["error"] != "User with this email already exists" {
+		t.Errorf(
+			"Expected the 'error' key of the response to be set to 'User with this email already exists'. Got '%s'",
+			res["error"],
+		)
+	}
+}
+
 func TestCreateUserMissedFields(t *testing.T) {
 	var jsonStr = []byte(`{}`)
 

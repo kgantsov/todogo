@@ -33,8 +33,17 @@ func CreateUser(c *gin.Context) {
 	if e == nil {
 		user.Password = hashPassword(user.Password)
 
-		db.Create(&user)
-		c.JSON(201, user)
+		var exisingUser models.User
+
+		db.Where("email = ?", user.Email).First(&exisingUser)
+
+		if exisingUser.ID != 0 {
+			c.JSON(409, gin.H{"error": "User with this email already exists"})
+		} else {
+			db.Create(&user)
+			c.JSON(201, user)
+		}
+
 	} else {
 		c.JSON(422, gin.H{"error": e})
 	}
