@@ -67,7 +67,9 @@ func GetTodos(c *gin.Context) {
 
 	var todos []models.Todo
 
-	db.Order("id asc").Where("user_id = ? AND todo_list_id = ?", currentUser.ID, listId).Find(&todos)
+	db.Order("completed asc, id asc").Where(
+		"user_id = ? AND todo_list_id = ?", currentUser.ID, listId,
+	).Find(&todos)
 
 	c.JSON(200, todos)
 }

@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"bytes"
+	"sort"
 )
 
 var shoppingTodos = []models.Todo{
@@ -64,7 +65,30 @@ func TestGetTodos(t *testing.T) {
 		return
 	}
 
+	// sort TODOs to display incomplete tasks first
+	sort.Slice(shoppingTodos, func(i, j int) bool {
+		var completedI, completedJ int8
+		if shoppingTodos[i].Completed {
+			completedI = 1
+		}
+		if shoppingTodos[j].Completed {
+			completedJ = 1
+		}
+
+		if completedI < completedJ {
+			return true
+		}
+		if completedI > completedJ {
+			return false
+		}
+
+		return shoppingTodos[i].ID < shoppingTodos[j].ID
+	})
+
 	for i := range shoppingTodos {
+		if res[i].ID != shoppingTodos[i].ID {
+			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].ID, res[i].ID)
+		}
 		if res[i].Title != shoppingTodos[i].Title {
 			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].Title, res[i].Title)
 		}
