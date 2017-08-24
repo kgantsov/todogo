@@ -8,6 +8,7 @@ import (
 	"os"
 	"flag"
 	"fmt"
+	"github.com/newrelic/go-agent"
 )
 
 func DBMiddleware(db gorm.DB) gin.HandlerFunc {
@@ -22,6 +23,20 @@ func DBMiddleware(db gorm.DB) gin.HandlerFunc {
 func CorsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Next()
+	}
+}
+
+func NewRelicMiddleware(appName, newRelicKey string) gin.HandlerFunc {
+	config := newrelic.NewConfig(appName, newRelicKey)
+	app, _ := newrelic.NewApplication(config)
+
+	return func(c *gin.Context) {
+		name := c.HandlerName()
+
+		txn := app.StartTransaction(name, c.Writer, c.Request)
+		defer txn.End()
+
 		c.Next()
 	}
 }
@@ -44,6 +59,7 @@ func main() {
 	r := gin.New()
 
 	r.Use(gin.Recovery())
+	r.Use(NewRelicMiddleware(os.Getenv("NEWRELIC_APP_NAME"), os.Getenv("NEWRELIC_APP_KEY")))
 
 	if *debug == true {
 		r.Use(gin.Logger())
