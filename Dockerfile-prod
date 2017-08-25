@@ -1,0 +1,7 @@
+FROM alpine
+
+RUN apk add -U bash
+RUN apk --no-cache add ca-certificates && update-ca-certificates
+ADD ./todogo /app/
+
+CMD [“/app/todogo”]

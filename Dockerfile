@@ -7,6 +7,7 @@ WORKDIR /go/src/github.com/kgantsov/todogo/
 RUN go get github.com/lib/pq
 RUN go get github.com/jinzhu/gorm
 RUN go get gopkg.in/gin-gonic/gin.v1
+RUN go get gopkg.in/dgrijalva/jwt-go.v3
 RUN go build
 
 CMD ["/go/src/github.com/kgantsov/todogo/todogo"]
