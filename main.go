@@ -61,7 +61,7 @@ func main() {
 	r.Use(gin.Recovery())
 	r.Use(NewRelicMiddleware(os.Getenv("NEWRELIC_APP_NAME"), os.Getenv("NEWRELIC_APP_KEY")))
 
-	if *debug == true {
+	if *debug {
 		r.Use(gin.Logger())
 		r.Use(CorsMiddleware())
 	}

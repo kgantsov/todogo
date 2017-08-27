@@ -380,7 +380,7 @@ func TestCreateTodo(t *testing.T) {
 	if res.Title != "Milk" {
 		t.Errorf("Response body should be `Milk`, was %s", res.Title)
 	}
-	if res.Completed != true {
+	if !res.Completed {
 		t.Errorf("Response body should be `true`, was %s", res.Completed)
 	}
 	if res.Note != "1.5 L 1.5%" {
@@ -492,7 +492,7 @@ func TestUpdateTodo(t *testing.T) {
 	if res.Title != "Milk" {
 		t.Errorf("Response body should be `Milk`, was %s", res.Title)
 	}
-	if res.Completed != true {
+	if !res.Completed {
 		t.Errorf("Response body should be `true`, was %s", res.Completed)
 	}
 	if res.Note != "1.5 L 1.5%" {
