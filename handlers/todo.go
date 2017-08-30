@@ -144,6 +144,7 @@ func UpdateTodo(c *gin.Context) {
 			UserID:     todo.UserID,
 			CreatedAt:  todo.CreatedAt,
 			UpdatedAt:  time.Now(),
+			DeadLineAt: newTodo.DeadLineAt,
 		}
 
 		db.Save(&todo)

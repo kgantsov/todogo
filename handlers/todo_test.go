@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"bytes"
 	"sort"
+	"time"
 )
 
 var shoppingTodos = []models.Todo{
@@ -100,6 +101,9 @@ func TestGetTodos(t *testing.T) {
 		}
 		if res[i].TodoListID != shoppingTodos[i].TodoListID {
 			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].TodoListID, res[i].TodoListID)
+		}
+		if res[i].UserID != shoppingTodos[i].UserID {
+			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].UserID, res[i].UserID)
 		}
 	}
 }
@@ -237,6 +241,9 @@ func TestGetTodo(t *testing.T) {
 	}
 	if res.TodoListID != todo.TodoListID {
 		t.Errorf("Response body should be `%s`, was  %s", todo.TodoListID, res.TodoListID)
+	}
+	if res.UserID != todo.UserID {
+		t.Errorf("Response body should be `%s`, was  %s", todo.UserID, res.UserID)
 	}
 }
 
@@ -388,6 +395,55 @@ func TestCreateTodo(t *testing.T) {
 	}
 	if res.TodoListID != 1 {
 		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+	}
+}
+
+func TestCreateTodoWithDeadLine(t *testing.T) {
+	var jsonStr = []byte(`{"title": "Milk", "completed": true, "note": "1.5 L 1.5%", "dead_line_at": "2009-11-17T20:34:58.0Z"}`)
+
+	req, _ := http.NewRequest(
+		"POST", "/api/v1/list/1/todo/", bytes.NewBuffer(jsonStr),
+	)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusCreated {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusCreated, resp.Code)
+	}
+
+	bodyAsString := resp.Body.String()
+
+	var res models.Todo
+
+	err := json.Unmarshal([]byte(bodyAsString), &res)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if res.Title != "Milk" {
+		t.Errorf("Response body should be `Milk`, was %s", res.Title)
+	}
+	if !res.Completed {
+		t.Errorf("Response body should be `true`, was %s", res.Completed)
+	}
+	if res.Note != "1.5 L 1.5%" {
+		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
+	}
+	if res.TodoListID != 1 {
+		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+	}
+	if res.DeadLineAt != time.Date(2009, 11, 17, 20, 34, 58, 0, time.UTC) {
+		t.Errorf("Response body should be `1`, was %s", res.DeadLineAt)
 	}
 }
 

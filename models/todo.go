@@ -13,4 +13,5 @@ type Todo struct {
 	Note       string    `gorm:"not null" form:"note" json:"note"`
 	TodoListID uint      `gorm:"index" form:"todo_list_id" json:"todo_list_id"`
 	UserID     uint      `gorm:"index" form:"user_id" json:"user_id"`
+	DeadLineAt time.Time `gorm:"index" form:"dead_line_at" json:"dead_line_at"`
 }
