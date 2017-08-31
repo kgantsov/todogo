@@ -8,6 +8,7 @@ import (
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
 	"strconv"
+	"regexp"
 )
 
 func hashPassword(password string) string {
@@ -21,6 +22,15 @@ func OptionsUser(c *gin.Context) {
 	c.Next()
 }
 
+func isValidEmail(email string) bool {
+	regex, _ := regexp.Compile(`(\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3})`)
+
+	if regex.MatchString(email) {
+		return true
+	}
+	return false
+}
+
 func CreateUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
@@ -31,6 +41,10 @@ func CreateUser(c *gin.Context) {
 	e := c.BindJSON(&user)
 
 	if e == nil {
+		if !isValidEmail(user.Email) {
+			c.JSON(400, gin.H{"error": "Email address is not valid"})
+			return
+		}
 		user.Password = hashPassword(user.Password)
 
 		var exisingUser models.User
@@ -108,6 +122,11 @@ func UpdateUser(c *gin.Context) {
 
 	if e != nil {
 		c.JSON(422, e)
+	}
+
+	if !isValidEmail(newUser.Email) {
+		c.JSON(400, gin.H{"error": "Email address is not valid"})
+		return
 	}
 
 	var user models.User

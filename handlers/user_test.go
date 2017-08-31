@@ -284,6 +284,41 @@ func TestCreateUserMissedFields(t *testing.T) {
 	}
 }
 
+func TestCreateUserInvalidEmail(t *testing.T) {
+	var jsonStr = []byte(`{"name": "Petr", "email": "invalidemail.com", "password": "222"}`)
+
+	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusBadRequest {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusBadRequest, resp.Code)
+	}
+
+	bodyAsString := resp.Body.String()
+
+	var res map[string]string
+
+	err := json.Unmarshal([]byte(bodyAsString), &res)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if res["error"] != "Email address is not valid" {
+		t.Errorf(
+			"Expected the 'error' key of the response to be set to 'Access denied'. Got '%s'",
+			res["error"],
+		)
+	}
+}
+
 func TestUpdateUser(t *testing.T) {
 	user := users[2]
 	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
@@ -380,6 +415,44 @@ func TestUpdateUserNoAuthToken(t *testing.T) {
 
 	if resp.Code != http.StatusForbidden {
 		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
+	}
+}
+
+func TestUpdateUserInvalidEmail(t *testing.T) {
+	user := users[2]
+	var jsonStr = []byte(`{"name": "Tim", "email": "invalidemail.com", "password": "444"}`)
+
+	req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/user/%d/", user.ID), bytes.NewBuffer(jsonStr))
+	token, _ := createToken(user.ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusBadRequest {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
+	}
+
+	bodyAsString := resp.Body.String()
+
+	var res map[string]string
+
+	err := json.Unmarshal([]byte(bodyAsString), &res)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if res["error"] != "Email address is not valid" {
+		t.Errorf(
+			"Expected the 'error' key of the response to be set to 'Access denied'. Got '%s'",
+			res["error"],
+		)
 	}
 }
 
