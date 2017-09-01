@@ -36,6 +36,10 @@ func CreateTodo(c *gin.Context) {
 	e := c.BindJSON(&todo)
 
 	if e == nil {
+		if todo.Priority == 0 {
+			todo.Priority = models.PRIORITY_NORMAL
+		}
+
 		currentUser := c.MustGet("CurrentUser").(models.User)
 		todo.UserID = currentUser.ID
 		todo.TodoListID = uint(listId)
@@ -145,6 +149,7 @@ func UpdateTodo(c *gin.Context) {
 			CreatedAt:  todo.CreatedAt,
 			UpdatedAt:  time.Now(),
 			DeadLineAt: newTodo.DeadLineAt,
+			Priority:   newTodo.Priority,
 		}
 
 		db.Save(&todo)

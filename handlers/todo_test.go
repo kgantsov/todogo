@@ -396,6 +396,58 @@ func TestCreateTodo(t *testing.T) {
 	if res.TodoListID != 1 {
 		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
 	}
+	if res.Priority != 4 {
+		t.Errorf("Response body should be `4`, was %d", res.Priority)
+	}
+}
+
+func TestCreateTodoWithPriority(t *testing.T) {
+	var jsonStr = []byte(`{"title": "Milk", "completed": true, "note": "1.5 L 1.5%", "priority": 5}`)
+
+	req, _ := http.NewRequest(
+		"POST", "/api/v1/list/1/todo/", bytes.NewBuffer(jsonStr),
+	)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusCreated {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusCreated, resp.Code)
+	}
+
+	bodyAsString := resp.Body.String()
+
+	var res models.Todo
+
+	err := json.Unmarshal([]byte(bodyAsString), &res)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if res.Title != "Milk" {
+		t.Errorf("Response body should be `Milk`, was %s", res.Title)
+	}
+	if !res.Completed {
+		t.Errorf("Response body should be `true`, was %s", res.Completed)
+	}
+	if res.Note != "1.5 L 1.5%" {
+		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
+	}
+	if res.TodoListID != 1 {
+		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+	}
+	if res.Priority != 5 {
+		t.Errorf("Response body should be `5`, was %s", res.Priority)
+	}
 }
 
 func TestCreateTodoWithDeadLine(t *testing.T) {
@@ -556,6 +608,60 @@ func TestUpdateTodo(t *testing.T) {
 	}
 	if res.TodoListID != 1 {
 		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+	}
+}
+
+func TestUpdateTodoWithPriority(t *testing.T) {
+	var jsonStr = []byte(`{"title": "Milk", "completed": true, "note": "1.5 L 1.5%", "priority": 7}`)
+
+	todo := shoppingTodos[2]
+
+	req, _ := http.NewRequest(
+		"PUT",
+		fmt.Sprintf("/api/v1/list/%d/todo/%d/", todo.TodoListID, todo.ID),
+		bytes.NewBuffer(jsonStr),
+	)
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateUserFixtures(db)
+	CreateTodoListFixtures(db)
+	CreateTodoFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
+	}
+
+	bodyAsString := resp.Body.String()
+
+	var res models.Todo
+
+	err := json.Unmarshal([]byte(bodyAsString), &res)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if res.Title != "Milk" {
+		t.Errorf("Response body should be `Milk`, was %s", res.Title)
+	}
+	if !res.Completed {
+		t.Errorf("Response body should be `true`, was %s", res.Completed)
+	}
+	if res.Note != "1.5 L 1.5%" {
+		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
+	}
+	if res.TodoListID != 1 {
+		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+	}
+	if res.Priority != 7 {
+		t.Errorf("Response body should be `7`, was %d", res.Priority)
 	}
 }
 

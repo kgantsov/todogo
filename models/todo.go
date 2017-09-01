@@ -4,6 +4,21 @@ import (
 	"time"
 )
 
+
+type PRIORITY int
+
+const (
+	PRIORITY_NIL PRIORITY = iota
+	PRIORITY_IRRELEVANT
+	PRIORITY_EXTRA_LOW
+	PRIORITY_LOW
+	PRIORITY_NORMAL
+	PRIORITY_HIGH
+	PRIORITY_URGENT
+	PRIORITY_SUPER_URGENT
+	PRIORITY_IMMEDIATE
+)
+
 type Todo struct {
 	ID         uint      `gorm:"primary_key;AUTO_INCREMENT" form:"id" json:"id"`
 	CreatedAt  time.Time `gorm:"not null" form:"created_at" json:"created_at"`
@@ -14,4 +29,5 @@ type Todo struct {
 	TodoListID uint      `gorm:"index" form:"todo_list_id" json:"todo_list_id"`
 	UserID     uint      `gorm:"index" form:"user_id" json:"user_id"`
 	DeadLineAt time.Time `gorm:"index" form:"dead_line_at" json:"dead_line_at"`
+	Priority   PRIORITY  `gorm:"index" form:"priority" json:"priority"`
 }
