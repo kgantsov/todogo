@@ -13,13 +13,69 @@ import (
 )
 
 var shoppingTodos = []models.Todo{
-	{ID: 1, Title: "Milk", Completed: true, Note: "Milk", TodoListID: 1, UserID: users[0].ID},
-	{ID: 2, Title: "Bread", Completed: false, Note: "Bread", TodoListID: 1, UserID: users[0].ID},
-	{ID: 3, Title: "Cucumber", Completed: true, Note: "Cucumber", TodoListID: 1, UserID: users[0].ID},
-	{ID: 4, Title: "Tomato", Completed: false, Note: "Tomato", TodoListID: 1, UserID: users[0].ID},
-	{ID: 5, Title: "Oil", Completed: false, Note: "Oil", TodoListID: 1, UserID: users[0].ID},
-	{ID: 6, Title: "Potato", Completed: false, Note: "Potato", TodoListID: 1, UserID: users[0].ID},
-	{ID: 7, Title: "Ice cream", Completed: true, Note: "Ice cream", TodoListID: 1, UserID: users[0].ID},
+	{
+		ID: 1,
+		Title: "Milk",
+		Completed: true,
+		Note: "Milk",
+		TodoListID: 1,
+		UserID: users[0].ID,
+		Priority: models.PRIORITY_NORMAL,
+	},
+	{
+		ID: 2,
+		Title: "Bread",
+		Completed: false,
+		Note: "Bread",
+		TodoListID: 1,
+		UserID: users[0].ID,
+		Priority: models.PRIORITY_NORMAL,
+	},
+	{
+		ID: 3,
+		Title: "Cucumber",
+		Completed: true,
+		Note: "Cucumber",
+		TodoListID: 1,
+		UserID: users[0].ID,
+		Priority: models.PRIORITY_NORMAL,
+	},
+	{
+		ID: 4,
+		Title: "Tomato",
+		Completed: false,
+		Note: "Tomato",
+		TodoListID: 1,
+		UserID: users[0].ID,
+		Priority: models.PRIORITY_URGENT,
+	},
+	{
+		ID: 5,
+		Title: "Oil",
+		Completed: false,
+		Note: "Oil",
+		TodoListID: 1,
+		UserID: users[0].ID,
+		Priority: models.PRIORITY_HIGH,
+	},
+	{
+		ID: 6,
+		Title: "Potato",
+		Completed: false,
+		Note: "Potato",
+		TodoListID: 1,
+		UserID: users[0].ID,
+		Priority: models.PRIORITY_NORMAL,
+	},
+	{
+		ID: 7,
+		Title: "Ice cream",
+		Completed: true,
+		Note: "Ice cream",
+		TodoListID: 1,
+		UserID: users[0].ID,
+		Priority: models.PRIORITY_NORMAL,
+	},
 }
 var workTodos = []models.Todo{
 	{ID: 8, Title: "Write some tests for todo list", Completed: true, Note: "", TodoListID: 2, UserID: users[0].ID},
@@ -81,6 +137,13 @@ func TestGetTodos(t *testing.T) {
 		}
 		if completedI > completedJ {
 			return false
+		}
+
+		if shoppingTodos[i].Priority < shoppingTodos[j].Priority {
+			return false
+		}
+		if shoppingTodos[i].Priority > shoppingTodos[j].Priority {
+			return true
 		}
 
 		return shoppingTodos[i].ID < shoppingTodos[j].ID
