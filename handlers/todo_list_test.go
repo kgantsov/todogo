@@ -3,12 +3,13 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/jinzhu/gorm"
-	"github.com/kgantsov/todogo/models"
-	"gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/jinzhu/gorm"
+	"github.com/kgantsov/todogo/models"
+	"gopkg.in/gin-gonic/gin.v1"
 )
 
 func DBMiddleware(db gorm.DB) gin.HandlerFunc {

@@ -1,14 +1,15 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"os"
+
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/handlers"
 	"github.com/kgantsov/todogo/models"
-	"gopkg.in/gin-gonic/gin.v1"
-	"os"
-	"flag"
-	"fmt"
 	"github.com/newrelic/go-agent"
+	"gopkg.in/gin-gonic/gin.v1"
 )
 
 func DBMiddleware(db gorm.DB) gin.HandlerFunc {

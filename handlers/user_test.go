@@ -3,11 +3,12 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/kgantsov/todogo/models"
+	"fmt"
 	"net/http"
 	"testing"
+
 	"github.com/jinzhu/gorm"
-	"fmt"
+	"github.com/kgantsov/todogo/models"
 )
 
 var users = []models.User{
@@ -175,7 +176,6 @@ func TestGetUserWrongID(t *testing.T) {
 		)
 	}
 }
-
 
 func TestGetUserNoAuthToken(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/user/777/", nil)

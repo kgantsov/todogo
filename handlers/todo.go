@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
-	"strconv"
-	"time"
 )
 
 func OptionsTodo(c *gin.Context) {

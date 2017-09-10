@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
-	"time"
 )
 
 func OptionsTodoList(c *gin.Context) {

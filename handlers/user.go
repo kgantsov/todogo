@@ -1,14 +1,15 @@
 package handlers
 
 import (
-	"time"
 	"crypto/sha256"
 	"fmt"
+	"regexp"
+	"strconv"
+	"time"
+
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/gin-gonic/gin.v1"
-	"strconv"
-	"regexp"
 )
 
 func hashPassword(password string) string {

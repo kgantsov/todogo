@@ -3,17 +3,18 @@ package handlers
 import (
 	"fmt"
 	"time"
-	"gopkg.in/gin-gonic/gin.v1"
-	"gopkg.in/dgrijalva/jwt-go.v3"
+
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
+	"gopkg.in/dgrijalva/jwt-go.v3"
+	"gopkg.in/gin-gonic/gin.v1"
 )
 
 var mySigningKey = []byte("secret")
 
 type LoginForm struct {
-	Email     string `form:"email" json:"email" binding:"required"`
-	Password  string `form:"Password" json:"Password" binding:"required"`
+	Email    string `form:"email" json:"email" binding:"required"`
+	Password string `form:"Password" json:"Password" binding:"required"`
 }
 
 func OptionsLogin(c *gin.Context) {

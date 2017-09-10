@@ -1,9 +1,10 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
-	"fmt"
 )
 
 func InitDb(host, user, password, dbName string, debug bool) *gorm.DB {

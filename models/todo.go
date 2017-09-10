@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-
 type PRIORITY int
 
 const (

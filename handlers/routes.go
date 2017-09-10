@@ -1,10 +1,9 @@
 package handlers
 
 import (
-	"gopkg.in/gin-gonic/gin.v1"
 	"github.com/jinzhu/gorm"
+	"gopkg.in/gin-gonic/gin.v1"
 )
-
 
 func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {

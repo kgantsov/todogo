@@ -1,80 +1,81 @@
 package handlers
 
 import (
-	"github.com/jinzhu/gorm"
-	"github.com/kgantsov/todogo/models"
-	"testing"
-	"net/http"
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"bytes"
+	"net/http"
 	"sort"
+	"testing"
 	"time"
+
+	"github.com/jinzhu/gorm"
+	"github.com/kgantsov/todogo/models"
 )
 
 var shoppingTodos = []models.Todo{
 	{
-		ID: 1,
-		Title: "Milk",
-		Completed: true,
-		Note: "Milk",
+		ID:         1,
+		Title:      "Milk",
+		Completed:  true,
+		Note:       "Milk",
 		TodoListID: 1,
-		UserID: users[0].ID,
-		Priority: models.PRIORITY_NORMAL,
+		UserID:     users[0].ID,
+		Priority:   models.PRIORITY_NORMAL,
 	},
 	{
-		ID: 2,
-		Title: "Bread",
-		Completed: false,
-		Note: "Bread",
+		ID:         2,
+		Title:      "Bread",
+		Completed:  false,
+		Note:       "Bread",
 		TodoListID: 1,
-		UserID: users[0].ID,
-		Priority: models.PRIORITY_NORMAL,
+		UserID:     users[0].ID,
+		Priority:   models.PRIORITY_NORMAL,
 	},
 	{
-		ID: 3,
-		Title: "Cucumber",
-		Completed: true,
-		Note: "Cucumber",
+		ID:         3,
+		Title:      "Cucumber",
+		Completed:  true,
+		Note:       "Cucumber",
 		TodoListID: 1,
-		UserID: users[0].ID,
-		Priority: models.PRIORITY_NORMAL,
+		UserID:     users[0].ID,
+		Priority:   models.PRIORITY_NORMAL,
 	},
 	{
-		ID: 4,
-		Title: "Tomato",
-		Completed: false,
-		Note: "Tomato",
+		ID:         4,
+		Title:      "Tomato",
+		Completed:  false,
+		Note:       "Tomato",
 		TodoListID: 1,
-		UserID: users[0].ID,
-		Priority: models.PRIORITY_URGENT,
+		UserID:     users[0].ID,
+		Priority:   models.PRIORITY_URGENT,
 	},
 	{
-		ID: 5,
-		Title: "Oil",
-		Completed: false,
-		Note: "Oil",
+		ID:         5,
+		Title:      "Oil",
+		Completed:  false,
+		Note:       "Oil",
 		TodoListID: 1,
-		UserID: users[0].ID,
-		Priority: models.PRIORITY_HIGH,
+		UserID:     users[0].ID,
+		Priority:   models.PRIORITY_HIGH,
 	},
 	{
-		ID: 6,
-		Title: "Potato",
-		Completed: false,
-		Note: "Potato",
+		ID:         6,
+		Title:      "Potato",
+		Completed:  false,
+		Note:       "Potato",
 		TodoListID: 1,
-		UserID: users[0].ID,
-		Priority: models.PRIORITY_NORMAL,
+		UserID:     users[0].ID,
+		Priority:   models.PRIORITY_NORMAL,
 	},
 	{
-		ID: 7,
-		Title: "Ice cream",
-		Completed: true,
-		Note: "Ice cream",
+		ID:         7,
+		Title:      "Ice cream",
+		Completed:  true,
+		Note:       "Ice cream",
 		TodoListID: 1,
-		UserID: users[0].ID,
-		Priority: models.PRIORITY_NORMAL,
+		UserID:     users[0].ID,
+		Priority:   models.PRIORITY_NORMAL,
 	},
 }
 var workTodos = []models.Todo{
@@ -151,22 +152,22 @@ func TestGetTodos(t *testing.T) {
 
 	for i := range shoppingTodos {
 		if res[i].ID != shoppingTodos[i].ID {
-			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].ID, res[i].ID)
+			t.Errorf("Response body should be `%d`, was  %d", shoppingTodos[i].ID, res[i].ID)
 		}
 		if res[i].Title != shoppingTodos[i].Title {
 			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].Title, res[i].Title)
 		}
 		if res[i].Completed != shoppingTodos[i].Completed {
-			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].Completed, res[i].Completed)
+			t.Errorf("Response body should be `%v`, was  %v", shoppingTodos[i].Completed, res[i].Completed)
 		}
 		if res[i].Note != shoppingTodos[i].Note {
 			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].Note, res[i].Note)
 		}
 		if res[i].TodoListID != shoppingTodos[i].TodoListID {
-			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].TodoListID, res[i].TodoListID)
+			t.Errorf("Response body should be `%d`, was  %d", shoppingTodos[i].TodoListID, res[i].TodoListID)
 		}
 		if res[i].UserID != shoppingTodos[i].UserID {
-			t.Errorf("Response body should be `%s`, was  %s", shoppingTodos[i].UserID, res[i].UserID)
+			t.Errorf("Response body should be `%d`, was  %d", shoppingTodos[i].UserID, res[i].UserID)
 		}
 	}
 }
@@ -201,7 +202,7 @@ func TestGetTodosNoTodos(t *testing.T) {
 	}
 
 	if len(res) != 0 {
-		t.Errorf("Response body should be `[]`, was  %s", res)
+		t.Errorf("Response body should be `[]`, was %v", res)
 	}
 }
 
@@ -303,10 +304,10 @@ func TestGetTodo(t *testing.T) {
 		t.Errorf("Response body should be `%s`, was  %s", todo.Note, res.Note)
 	}
 	if res.TodoListID != todo.TodoListID {
-		t.Errorf("Response body should be `%s`, was  %s", todo.TodoListID, res.TodoListID)
+		t.Errorf("Response body should be `%d`, was  %d", todo.TodoListID, res.TodoListID)
 	}
 	if res.UserID != todo.UserID {
-		t.Errorf("Response body should be `%s`, was  %s", todo.UserID, res.UserID)
+		t.Errorf("Response body should be `%d`, was  %d", todo.UserID, res.UserID)
 	}
 }
 
@@ -392,7 +393,6 @@ func TestGetTodoWrongID(t *testing.T) {
 	}
 }
 
-
 func TestGetTodoNoAuthToken(t *testing.T) {
 	todo := shoppingTodos[2]
 
@@ -451,13 +451,13 @@ func TestCreateTodo(t *testing.T) {
 		t.Errorf("Response body should be `Milk`, was %s", res.Title)
 	}
 	if !res.Completed {
-		t.Errorf("Response body should be `true`, was %s", res.Completed)
+		t.Errorf("Response body should be `true`, was %v", res.Completed)
 	}
 	if res.Note != "1.5 L 1.5%" {
 		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
 	}
 	if res.TodoListID != 1 {
-		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+		t.Errorf("Response body should be `1`, was %d", res.TodoListID)
 	}
 	if res.Priority != 4 {
 		t.Errorf("Response body should be `4`, was %d", res.Priority)
@@ -500,16 +500,16 @@ func TestCreateTodoWithPriority(t *testing.T) {
 		t.Errorf("Response body should be `Milk`, was %s", res.Title)
 	}
 	if !res.Completed {
-		t.Errorf("Response body should be `true`, was %s", res.Completed)
+		t.Errorf("Response body should be `true`, was %v", res.Completed)
 	}
 	if res.Note != "1.5 L 1.5%" {
 		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
 	}
 	if res.TodoListID != 1 {
-		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+		t.Errorf("Response body should be `1`, was %d", res.TodoListID)
 	}
 	if res.Priority != 5 {
-		t.Errorf("Response body should be `5`, was %s", res.Priority)
+		t.Errorf("Response body should be `5`, was %d", res.Priority)
 	}
 }
 
@@ -549,13 +549,13 @@ func TestCreateTodoWithDeadLine(t *testing.T) {
 		t.Errorf("Response body should be `Milk`, was %s", res.Title)
 	}
 	if !res.Completed {
-		t.Errorf("Response body should be `true`, was %s", res.Completed)
+		t.Errorf("Response body should be `true`, was %v", res.Completed)
 	}
 	if res.Note != "1.5 L 1.5%" {
 		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
 	}
 	if res.TodoListID != 1 {
-		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+		t.Errorf("Response body should be `1`, was %d", res.TodoListID)
 	}
 	if res.DeadLineAt != time.Date(2009, 11, 17, 20, 34, 58, 0, time.UTC) {
 		t.Errorf("Response body should be `1`, was %s", res.DeadLineAt)
@@ -664,13 +664,13 @@ func TestUpdateTodo(t *testing.T) {
 		t.Errorf("Response body should be `Milk`, was %s", res.Title)
 	}
 	if !res.Completed {
-		t.Errorf("Response body should be `true`, was %s", res.Completed)
+		t.Errorf("Response body should be `true`, was %v", res.Completed)
 	}
 	if res.Note != "1.5 L 1.5%" {
 		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
 	}
 	if res.TodoListID != 1 {
-		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+		t.Errorf("Response body should be `1`, was %d", res.TodoListID)
 	}
 }
 
@@ -715,13 +715,13 @@ func TestUpdateTodoWithPriority(t *testing.T) {
 		t.Errorf("Response body should be `Milk`, was %s", res.Title)
 	}
 	if !res.Completed {
-		t.Errorf("Response body should be `true`, was %s", res.Completed)
+		t.Errorf("Response body should be `true`, was %v", res.Completed)
 	}
 	if res.Note != "1.5 L 1.5%" {
 		t.Errorf("Response body should be `1.5 L 1.5%%`, was %s", res.Note)
 	}
 	if res.TodoListID != 1 {
-		t.Errorf("Response body should be `1`, was %s", res.TodoListID)
+		t.Errorf("Response body should be `1`, was %d", res.TodoListID)
 	}
 	if res.Priority != 7 {
 		t.Errorf("Response body should be `7`, was %d", res.Priority)
