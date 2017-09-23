@@ -48,11 +48,8 @@ func main() {
 
 	flag.Parse()
 
-	db := models.InitDb(
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_USERNAME"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
+	db := models.InitDbURI(
+		os.Getenv("DB_URI"),
 		*debug,
 	)
 	models.CreateTables(db)

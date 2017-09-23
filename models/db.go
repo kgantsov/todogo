@@ -23,6 +23,18 @@ func InitDb(host, user, password, dbName string, debug bool) *gorm.DB {
 	return db
 }
 
+func InitDbURI(connectionString string, debug bool) *gorm.DB {
+	db, err := gorm.Open("postgres", connectionString)
+
+	db.LogMode(debug)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return db
+}
+
 func InitTestDb(host, user, password, dbName string, debug bool) *gorm.DB {
 	connectionString := fmt.Sprintf(
 		"host=%s sslmode=disable user=%s password=%s dbname=%s_test", host, user, password, dbName,
