@@ -12,3 +12,7 @@ type User struct {
 	Email     string    `gorm:"type:varchar(100);unique_index" form:"email" json:"email" binding:"required"`
 	Password  string    `gorm:"not null" form:"password" json:"password" binding:"required"`
 }
+
+func (User) TableName() string {
+	return "profiles"
+}

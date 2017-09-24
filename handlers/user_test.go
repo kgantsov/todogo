@@ -12,12 +12,12 @@ import (
 )
 
 var users = []models.User{
-	{ID: 1, Name: "Mike", Email: "mike@gmail.com", Password: "111"},
-	{ID: 2, Name: "Ben", Email: "ben@gmail.com", Password: "111"},
-	{ID: 3, Name: "Kevin", Email: "kevin@gmail.com", Password: "111"},
-	{ID: 4, Name: "Tom", Email: "tom@gmail.com", Password: "111"},
-	{ID: 5, Name: "Oliver", Email: "oliver@gmail.com", Password: "111"},
-	{ID: 6, Name: "Pol", Email: "pol@gmail.com", Password: "111"},
+	{ID: 1, Name: "Mike", Email: "mike@gmail.com", Password: hashPassword("111")},
+	{ID: 2, Name: "Ben", Email: "ben@gmail.com", Password: hashPassword("111")},
+	{ID: 3, Name: "Kevin", Email: "kevin@gmail.com", Password: hashPassword("111")},
+	{ID: 4, Name: "Tom", Email: "tom@gmail.com", Password: hashPassword("111")},
+	{ID: 5, Name: "Oliver", Email: "oliver@gmail.com", Password: hashPassword("111")},
+	{ID: 6, Name: "Pol", Email: "pol@gmail.com", Password: hashPassword("111")},
 }
 
 func CreateUserFixtures(db *gorm.DB) {
@@ -31,7 +31,9 @@ func TestGetUsers(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -72,7 +74,9 @@ func TestGetUsersEmptyTable(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -87,7 +91,9 @@ func TestGetUsersEmptyTable(t *testing.T) {
 func TestGetUsersEmptyTableNoAuthToken(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/user/", nil)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -106,7 +112,9 @@ func TestGetUser(t *testing.T) {
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -147,7 +155,9 @@ func TestGetUserWrongID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -180,7 +190,9 @@ func TestGetUserWrongID(t *testing.T) {
 func TestGetUserNoAuthToken(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/user/777/", nil)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -198,7 +210,9 @@ func TestCreateUser(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -236,7 +250,9 @@ func TestCreateUserExisingEmail(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -271,7 +287,9 @@ func TestCreateUserMissedFields(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -289,7 +307,9 @@ func TestCreateUserInvalidEmail(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -327,7 +347,9 @@ func TestUpdateUser(t *testing.T) {
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -366,11 +388,15 @@ func TestUpdateUser(t *testing.T) {
 func TestUpdateUserWrongID(t *testing.T) {
 	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
-	req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest(
+		"PUT", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), bytes.NewBuffer(jsonStr),
+	)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -405,7 +431,9 @@ func TestUpdateUserNoAuthToken(t *testing.T) {
 
 	req, _ := http.NewRequest("PUT", "/api/v1/user/777/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -426,7 +454,9 @@ func TestUpdateUserInvalidEmail(t *testing.T) {
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -462,7 +492,9 @@ func TestDeleteUser(t *testing.T) {
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -480,7 +512,9 @@ func TestDeleteUserWrongID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -513,7 +547,9 @@ func TestDeleteUserWrongID(t *testing.T) {
 func TestDeleteUserNoAuthToken(t *testing.T) {
 	req, _ := http.NewRequest("DELETE", "/api/v1/user/777/", nil)
 
-	db := models.InitTestDb("localhost", "todogo", "todogo", "todogo", false)
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
 
 	models.DropTables(db)
 	models.CreateTables(db)

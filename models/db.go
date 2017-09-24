@@ -51,6 +51,18 @@ func InitTestDb(host, user, password, dbName string, debug bool) *gorm.DB {
 	return db
 }
 
+func InitTestDbURI(connectionString string, debug bool) *gorm.DB {
+	db, err := gorm.Open("postgres", connectionString)
+
+	db.LogMode(debug)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return db
+}
+
 func CreateTables(db *gorm.DB) {
 	if !db.HasTable(&User{}) {
 		db.CreateTable(&User{})
