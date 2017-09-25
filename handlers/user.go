@@ -89,7 +89,7 @@ func GetUser(c *gin.Context) {
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if uint(userId) != currentUser.ID {
+	if uint64(userId) != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
 	}
 
@@ -114,7 +114,7 @@ func UpdateUser(c *gin.Context) {
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if uint(userId) != currentUser.ID {
+	if uint64(userId) != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
 	}
 
@@ -162,7 +162,7 @@ func DeleteUser(c *gin.Context) {
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if uint(userId) != currentUser.ID {
+	if uint64(userId) != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
 	}
 

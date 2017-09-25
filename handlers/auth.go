@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"strconv"
+
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
 	"gopkg.in/dgrijalva/jwt-go.v3"
@@ -52,9 +54,9 @@ func Login(c *gin.Context) {
 	c.JSON(401, gin.H{"error": "Login or password is incorrect"})
 }
 
-func createToken(userId uint) (string, error) {
+func createToken(userId uint64) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userId,
+		"user_id": strconv.FormatUint(userId, 10),
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -76,7 +78,9 @@ func validateToken(db *gorm.DB, tokenString string) (models.User, bool) {
 
 	if err == nil {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			db.Where("id = ?", claims["user_id"]).First(&user)
+			userId, _ := claims["user_id"].(string)
+
+			db.Where("id = ?", userId).First(&user)
 
 			if user.ID != 0 {
 				return user, true

@@ -43,7 +43,7 @@ func CreateTodo(c *gin.Context) {
 
 		currentUser := c.MustGet("CurrentUser").(models.User)
 		todo.UserID = currentUser.ID
-		todo.TodoListID = uint(listId)
+		todo.TodoListID = uint64(listId)
 
 		db.Create(&todo)
 		c.JSON(201, todo)
@@ -145,7 +145,7 @@ func UpdateTodo(c *gin.Context) {
 			Title:      newTodo.Title,
 			Completed:  newTodo.Completed,
 			Note:       newTodo.Note,
-			TodoListID: uint(listId),
+			TodoListID: uint64(listId),
 			UserID:     todo.UserID,
 			CreatedAt:  todo.CreatedAt,
 			UpdatedAt:  time.Now(),
