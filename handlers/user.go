@@ -4,11 +4,11 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
+	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
@@ -36,6 +36,7 @@ func CreateUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
 	var user models.User
@@ -52,9 +53,10 @@ func CreateUser(c *gin.Context) {
 
 		db.Where("email = ?", user.Email).First(&exisingUser)
 
-		if exisingUser.ID != 0 {
+		if exisingUser.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 			c.JSON(409, gin.H{"error": "User with this email already exists"})
 		} else {
+			user.ID = uuid.NewV4()
 			db.Create(&user)
 			c.JSON(201, user)
 		}
@@ -68,6 +70,7 @@ func GetUsers(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
 	var users []models.User
@@ -83,21 +86,23 @@ func GetUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	userId, _ := strconv.ParseUint(c.Params.ByName("userId"), 0, 64)
+	userId := uuid.FromStringOrNil(c.Params.ByName("userId"))
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if uint64(userId) != currentUser.ID {
+	if userId != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
+		return
 	}
 
 	var user models.User
 
-	db.First(&user, userId)
+	db.Where("id = ?", userId).First(&user)
 
-	if user.ID != 0 {
+	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(200, user)
 	} else {
 		c.JSON(404, gin.H{"error": "User not found"})
@@ -108,14 +113,16 @@ func UpdateUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	userId, _ := strconv.ParseUint(c.Params.ByName("userId"), 0, 64)
+	userId := uuid.FromStringOrNil(c.Params.ByName("userId"))
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if uint64(userId) != currentUser.ID {
+	if userId != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
+		return
 	}
 
 	var newUser models.User
@@ -123,6 +130,7 @@ func UpdateUser(c *gin.Context) {
 
 	if e != nil {
 		c.JSON(422, e)
+		return
 	}
 
 	if !isValidEmail(newUser.Email) {
@@ -132,9 +140,9 @@ func UpdateUser(c *gin.Context) {
 
 	var user models.User
 
-	db.First(&user, userId)
+	db.Where("id = ?", userId).First(&user)
 
-	if user.ID != 0 {
+	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		user = models.User{
 			ID:        user.ID,
 			Name:      newUser.Name,
@@ -156,21 +164,23 @@ func DeleteUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	userId, _ := strconv.ParseUint(c.Params.ByName("userId"), 0, 64)
+	userId := uuid.FromStringOrNil(c.Params.ByName("userId"))
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if uint64(userId) != currentUser.ID {
+	if userId != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
+		return
 	}
 
 	var user models.User
 
-	db.First(&user, userId)
+	db.Where("id = ?", userId).First(&user)
 
-	if user.ID != 0 {
+	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		db.Delete(&user)
 
 		c.Writer.WriteHeader(204)

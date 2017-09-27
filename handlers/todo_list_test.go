@@ -3,12 +3,15 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
+	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
@@ -21,13 +24,49 @@ func DBMiddleware(db gorm.DB) gin.HandlerFunc {
 	}
 }
 
+var todoLists = []models.TodoList{
+	{
+		ID:        uuid.NewV4(),
+		Title:     "Shopping list",
+		UserID:    users[0].ID,
+		CreatedAt: time.Now().Add(time.Second * 2),
+	},
+	{
+		ID:        uuid.NewV4(),
+		Title:     "Work list",
+		UserID:    users[0].ID,
+		CreatedAt: time.Now().Add(time.Second * 3),
+	},
+	{
+		ID:        uuid.NewV4(),
+		Title:     "Sport list",
+		UserID:    users[0].ID,
+		CreatedAt: time.Now().Add(time.Second * 4),
+	},
+	{
+		ID:        uuid.NewV4(),
+		Title:     "Todo project",
+		UserID:    users[1].ID,
+		CreatedAt: time.Now().Add(time.Second * 5),
+	},
+	{
+		ID:        uuid.NewV4(),
+		Title:     "Foogle project",
+		UserID:    users[1].ID,
+		CreatedAt: time.Now().Add(time.Second * 6),
+	},
+	{
+		ID:        uuid.NewV4(),
+		Title:     "Sport list",
+		UserID:    users[2].ID,
+		CreatedAt: time.Now().Add(time.Second * 7),
+	},
+}
+
 func CreateTodoListFixtures(db *gorm.DB) {
-	db.Create(&models.TodoList{ID: 1, Title: "Shopping list", UserID: users[0].ID})
-	db.Create(&models.TodoList{ID: 2, Title: "Work list", UserID: users[0].ID})
-	db.Create(&models.TodoList{ID: 3, Title: "Sport list", UserID: users[0].ID})
-	db.Create(&models.TodoList{ID: 4, Title: "Todo project", UserID: users[1].ID})
-	db.Create(&models.TodoList{ID: 5, Title: "Foogle project", UserID: users[1].ID})
-	db.Create(&models.TodoList{ID: 6, Title: "Sport list", UserID: users[2].ID})
+	for _, todoList := range todoLists {
+		db.Create(&todoList)
+	}
 }
 
 func ExecuteRequest(db *gorm.DB, req *http.Request) *httptest.ResponseRecorder {
@@ -72,29 +111,28 @@ func TestGetTodoLists(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if len(res) != 3 {
-		t.Errorf("Response body should be `3`, was  %s", len(res))
+		t.Errorf("Response body should be `3`, was  %d", len(res))
 	}
 
-	if res[0].ID != 1 {
-		t.Errorf("Response body should be `1`, was  %s", res[0].ID)
+	if res[0].ID != todoLists[0].ID {
+		t.Errorf("Response body should be `%v`, was  %v", todoLists[0].ID, res[0].ID)
 	}
 	if res[0].Title != "Shopping list" {
 		t.Errorf("Response body should be `Shopping list`, was  %s", res[0].Title)
 	}
 
-	if res[1].ID != 2 {
-		t.Errorf("Response body should be `2`, was  %s", res[1].ID)
+	if res[1].ID != todoLists[1].ID {
+		t.Errorf("Response body should be `%v`, was  %v", todoLists[1].ID, res[1].ID)
 	}
 	if res[1].Title != "Work list" {
 		t.Errorf("Response body should be `Work list`, was  %s", res[1].Title)
 	}
 
-	if res[2].ID != 3 {
-		t.Errorf("Response body should be `3`, was  %s", res[2].ID)
+	if res[2].ID != todoLists[2].ID {
+		t.Errorf("Response body should be `%v`, was  %v", todoLists[2].ID, res[2].ID)
 	}
 	if res[2].Title != "Sport list" {
 		t.Errorf("Response body should be `Sport list`, was  %s", res[2].Title)
@@ -127,7 +165,6 @@ func TestGetTodoListsEmptyTable(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if len(res) != 0 {
@@ -192,7 +229,7 @@ func TestGetTodoListsWrongAuthToken(t *testing.T) {
 }
 
 func TestGetTodoList(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/v1/list/2/", nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/api/v1/list/%s/", todoLists[2].ID.String()), nil)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -218,19 +255,18 @@ func TestGetTodoList(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
-	if res.ID != 2 {
-		t.Errorf("Response body should be `2`, was  %s", res.ID)
+	if res.ID != todoLists[2].ID {
+		t.Errorf("Response body should be `%v`, was  %v", todoLists[2].ID, res.ID)
 	}
-	if res.Title != "Work list" {
-		t.Errorf("Response body should be `Work list`, was  %s", res.Title)
+	if res.Title != todoLists[2].Title {
+		t.Errorf("Response body should be `%s`, was  %s", todoLists[2].Title, res.Title)
 	}
 }
 
 func TestGetTodoListWrongID(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/v1/list/777/", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/list/E41B72FE-B184-4A85-B280-0544DEC106C7/", nil)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -256,7 +292,6 @@ func TestGetTodoListWrongID(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "TODO list not found" {
@@ -268,7 +303,7 @@ func TestGetTodoListWrongID(t *testing.T) {
 }
 
 func TestGetTodoListNoAuthToken(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/v1/list/2/", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/list/E41B72FE-B184-4A85-B280-0544DEC106C7/", nil)
 
 	db := models.InitTestDbURI(
 		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
@@ -310,14 +345,42 @@ func TestCreateTodoList(t *testing.T) {
 
 	bodyAsString := resp.Body.String()
 
-	var res models.TodoList
+	var todoList models.TodoList
 
-	err := json.Unmarshal([]byte(bodyAsString), &res)
+	err := json.Unmarshal([]byte(bodyAsString), &todoList)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
+	if todoList.Title != "My tasks" {
+		t.Errorf("Response body should be `My tasks`, was  %s", todoList.Title)
+	}
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/api/v1/list/%s/", todoList.ID.String()), nil)
+	req.Header.Set("Auth-Token", token)
+
+	db = models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
+
+	resp = ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusOK {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusOK, resp.Code)
+	}
+
+	bodyAsString = resp.Body.String()
+
+	var res models.TodoList
+
+	err = json.Unmarshal([]byte(bodyAsString), &res)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+	}
+
+	if res.ID != todoList.ID {
+		t.Errorf("Response body should be `%d`, was  %d", todoList.ID, res.ID)
+	}
 	if res.Title != "My tasks" {
 		t.Errorf("Response body should be `My tasks`, was  %s", res.Title)
 	}
@@ -370,7 +433,9 @@ func TestCreateTodoListNoAuthToken(t *testing.T) {
 func TestUpdateTodoList(t *testing.T) {
 	var jsonStr = []byte(`{"title": "My tasks"}`)
 
-	req, _ := http.NewRequest("PUT", "/api/v1/list/2/", bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest(
+		"PUT", fmt.Sprintf("/api/v1/list/%s/", todoLists[2].ID.String()), bytes.NewBuffer(jsonStr),
+	)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -396,11 +461,10 @@ func TestUpdateTodoList(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
-	if res.ID != 2 {
-		t.Errorf("Response body should be `4`, was  %s", res.ID)
+	if res.ID != todoLists[2].ID {
+		t.Errorf("Response body should be `%v`, was  %v", todoLists[2].ID, res.ID)
 	}
 	if res.Title != "My tasks" {
 		t.Errorf("Response body should be `My tasks`, was  %s", res.Title)
@@ -410,7 +474,9 @@ func TestUpdateTodoList(t *testing.T) {
 func TestUpdateTodoListWrongID(t *testing.T) {
 	var jsonStr = []byte(`{"title": "My tasks"}`)
 
-	req, _ := http.NewRequest("PUT", "/api/v1/list/777/", bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest(
+		"PUT", "/api/v1/list/E41B72FE-B184-4A85-B280-0544DEC106C7/", bytes.NewBuffer(jsonStr),
+	)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -436,7 +502,6 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "Todo List not found" {
@@ -450,7 +515,9 @@ func TestUpdateTodoListWrongID(t *testing.T) {
 func TestUpdateTodoListNoAuthToken(t *testing.T) {
 	var jsonStr = []byte(`{"title": "My tasks"}`)
 
-	req, _ := http.NewRequest("PUT", "/api/v1/list/777/", bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest(
+		"PUT", "/api/v1/list/E41B72FE-B184-4A85-B280-0544DEC106C7/", bytes.NewBuffer(jsonStr),
+	)
 
 	db := models.InitTestDbURI(
 		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
@@ -469,7 +536,9 @@ func TestUpdateTodoListNoAuthToken(t *testing.T) {
 }
 
 func TestDeleteTodoList(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", "/api/v1/list/2/", nil)
+	req, _ := http.NewRequest(
+		"DELETE", fmt.Sprintf("/api/v1/list/%s/", todoLists[2].ID.String()), nil,
+	)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -490,7 +559,7 @@ func TestDeleteTodoList(t *testing.T) {
 }
 
 func TestDeleteTodoListWrongID(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", "/api/v1/list/777/", nil)
+	req, _ := http.NewRequest("DELETE", "/api/v1/list/E41B72FE-B184-4A85-B280-0544DEC106C7/", nil)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -516,7 +585,6 @@ func TestDeleteTodoListWrongID(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "Todo List not found" {
@@ -528,7 +596,7 @@ func TestDeleteTodoListWrongID(t *testing.T) {
 }
 
 func TestDeleteTodoListNoAuthToken(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", "/api/v1/list/777/", nil)
+	req, _ := http.NewRequest("DELETE", "/api/v1/list/E41B72FE-B184-4A85-B280-0544DEC106C7/", nil)
 
 	db := models.InitTestDbURI(
 		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,

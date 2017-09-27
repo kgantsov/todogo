@@ -1,22 +1,18 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"testing"
-	"github.com/kgantsov/todogo/models"
-	"bytes"
-	"fmt"
-)
 
+	"github.com/kgantsov/todogo/models"
+)
 
 func TestLogin(t *testing.T) {
 	var jsonStr = []byte(`{"email": "mike@gmail.com", "password": "111"}`)
 
 	req, _ := http.NewRequest("POST", "/api/v1/auth/login/", bytes.NewBuffer(jsonStr))
-
-	token, _ := createToken(users[0].ID)
-	req.Header.Set("Auth-Token", token)
 
 	db := models.InitTestDbURI(
 		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
@@ -64,28 +60,51 @@ func TestLogin(t *testing.T) {
 	}
 
 	if len(todoList) != 3 {
-		t.Errorf("Response body should be `3`, was  %s", len(todoList))
+		t.Errorf("Response body should be `3`, was  %d", len(todoList))
 	}
 
-	if todoList[0].ID != 1 {
+	if todoList[0].ID != todoLists[0].ID {
 		t.Errorf("Response body should be `1`, was  %s", todoList[0].ID)
 	}
 	if todoList[0].Title != "Shopping list" {
 		t.Errorf("Response body should be `Shopping list`, was  %s", todoList[0].Title)
 	}
 
-	if todoList[1].ID != 2 {
+	if todoList[1].ID != todoLists[0].ID {
 		t.Errorf("Response body should be `2`, was  %s", todoList[1].ID)
 	}
 	if todoList[1].Title != "Work list" {
 		t.Errorf("Response body should be `Work list`, was  %s", todoList[1].Title)
 	}
 
-	if todoList[2].ID != 3 {
+	if todoList[2].ID != todoLists[0].ID {
 		t.Errorf("Response body should be `3`, was  %s", todoList[2].ID)
 	}
 	if todoList[2].Title != "Sport list" {
 		t.Errorf("Response body should be `Sport list`, was  %s", todoList[2].Title)
+	}
+}
+
+func TestLoginNonExistentUser(t *testing.T) {
+	var jsonStr = []byte(`{"email": "mike@gmail.com", "password": "111"}`)
+
+	req, _ := http.NewRequest("POST", "/api/v1/auth/login/", bytes.NewBuffer(jsonStr))
+
+	token, _ := createToken(users[0].ID)
+	req.Header.Set("Auth-Token", token)
+
+	db := models.InitTestDbURI(
+		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
+	)
+
+	models.DropTables(db)
+	models.CreateTables(db)
+	CreateTodoListFixtures(db)
+
+	resp := ExecuteRequest(db, req)
+
+	if resp.Code != http.StatusUnauthorized {
+		t.Errorf("Expected response code %d. Got %d\n", http.StatusUnauthorized, resp.Code)
 	}
 }
 
@@ -165,8 +184,6 @@ func TestLoginNewUser(t *testing.T) {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Println(":::::", res)
 }
 
 func TestLoginWithoutToken(t *testing.T) {
@@ -210,7 +227,6 @@ func TestLoginWithoutToken(t *testing.T) {
 		t.Errorf("Expected response code %d. Got %d\n", http.StatusForbidden, resp.Code)
 	}
 }
-
 
 func TestLoginIncorrectPassword(t *testing.T) {
 	var jsonStr = []byte(`{"email": "mike@gmail.com", "password": "222"}`)

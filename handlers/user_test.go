@@ -9,15 +9,16 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
+	uuid "github.com/satori/go.uuid"
 )
 
 var users = []models.User{
-	{ID: 1, Name: "Mike", Email: "mike@gmail.com", Password: hashPassword("111")},
-	{ID: 2, Name: "Ben", Email: "ben@gmail.com", Password: hashPassword("111")},
-	{ID: 3, Name: "Kevin", Email: "kevin@gmail.com", Password: hashPassword("111")},
-	{ID: 4, Name: "Tom", Email: "tom@gmail.com", Password: hashPassword("111")},
-	{ID: 5, Name: "Oliver", Email: "oliver@gmail.com", Password: hashPassword("111")},
-	{ID: 6, Name: "Pol", Email: "pol@gmail.com", Password: hashPassword("111")},
+	{ID: uuid.NewV4(), Name: "Mike", Email: "mike@gmail.com", Password: hashPassword("111")},
+	{ID: uuid.NewV4(), Name: "Ben", Email: "ben@gmail.com", Password: hashPassword("111")},
+	{ID: uuid.NewV4(), Name: "Kevin", Email: "kevin@gmail.com", Password: hashPassword("111")},
+	{ID: uuid.NewV4(), Name: "Tom", Email: "tom@gmail.com", Password: hashPassword("111")},
+	{ID: uuid.NewV4(), Name: "Oliver", Email: "oliver@gmail.com", Password: hashPassword("111")},
+	{ID: uuid.NewV4(), Name: "Pol", Email: "pol@gmail.com", Password: hashPassword("111")},
 }
 
 func CreateUserFixtures(db *gorm.DB) {
@@ -52,7 +53,6 @@ func TestGetUsers(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res[0].ID != users[0].ID {
@@ -108,7 +108,7 @@ func TestGetUsersEmptyTableNoAuthToken(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	user := users[2]
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/api/v1/user/%d/", user.ID), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/api/v1/user/%s/", user.ID.String()), nil)
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -133,7 +133,6 @@ func TestGetUser(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res.ID != user.ID {
@@ -151,7 +150,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestGetUserWrongID(t *testing.T) {
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/api/v1/user/%s/", users[2].ID.String()), nil)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -176,7 +175,6 @@ func TestGetUserWrongID(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "Access denied" {
@@ -188,7 +186,7 @@ func TestGetUserWrongID(t *testing.T) {
 }
 
 func TestGetUserNoAuthToken(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/v1/user/777/", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/user/6A4FE6C6-CA36-46D7-A3B4-6F73DA3F053A/", nil)
 
 	db := models.InitTestDbURI(
 		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
@@ -231,7 +229,6 @@ func TestCreateUser(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res.Name != "Petr" {
@@ -271,7 +268,6 @@ func TestCreateUserExisingEmail(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "User with this email already exists" {
@@ -328,7 +324,6 @@ func TestCreateUserInvalidEmail(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "Email address is not valid" {
@@ -343,7 +338,9 @@ func TestUpdateUser(t *testing.T) {
 	user := users[2]
 	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
-	req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/user/%d/", user.ID), bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest(
+		"PUT", fmt.Sprintf("/api/v1/user/%s/", user.ID.String()), bytes.NewBuffer(jsonStr),
+	)
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -368,7 +365,6 @@ func TestUpdateUser(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res.ID != user.ID {
@@ -389,7 +385,7 @@ func TestUpdateUserWrongID(t *testing.T) {
 	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
 	req, _ := http.NewRequest(
-		"PUT", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), bytes.NewBuffer(jsonStr),
+		"PUT", fmt.Sprintf("/api/v1/user/%s/", users[2].ID.String()), bytes.NewBuffer(jsonStr),
 	)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
@@ -415,7 +411,6 @@ func TestUpdateUserWrongID(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "Access denied" {
@@ -429,7 +424,9 @@ func TestUpdateUserWrongID(t *testing.T) {
 func TestUpdateUserNoAuthToken(t *testing.T) {
 	var jsonStr = []byte(`{"name": "Tim", "email": "tim@gmail.com", "password": "444"}`)
 
-	req, _ := http.NewRequest("PUT", "/api/v1/user/777/", bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest(
+		"PUT", "/api/v1/user/6A4FE6C6-CA36-46D7-A3B4-6F73DA3F053A/", bytes.NewBuffer(jsonStr),
+	)
 
 	db := models.InitTestDbURI(
 		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
@@ -450,7 +447,9 @@ func TestUpdateUserInvalidEmail(t *testing.T) {
 	user := users[2]
 	var jsonStr = []byte(`{"name": "Tim", "email": "invalidemail.com", "password": "444"}`)
 
-	req, _ := http.NewRequest("PUT", fmt.Sprintf("/api/v1/user/%d/", user.ID), bytes.NewBuffer(jsonStr))
+	req, _ := http.NewRequest(
+		"PUT", fmt.Sprintf("/api/v1/user/%s/", user.ID.String()), bytes.NewBuffer(jsonStr),
+	)
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -475,7 +474,6 @@ func TestUpdateUserInvalidEmail(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "Email address is not valid" {
@@ -488,7 +486,7 @@ func TestUpdateUserInvalidEmail(t *testing.T) {
 
 func TestDeleteUser(t *testing.T) {
 	user := users[2]
-	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/user/%d/", user.ID), nil)
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/user/%s/", user.ID.String()), nil)
 	token, _ := createToken(user.ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -508,7 +506,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestDeleteUserWrongID(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/user/%d/", users[2].ID), nil)
+	req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/user/%s/", users[2].ID.String()), nil)
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
@@ -533,7 +531,6 @@ func TestDeleteUserWrongID(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyAsString), &res)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	if res["error"] != "Access denied" {
@@ -545,7 +542,7 @@ func TestDeleteUserWrongID(t *testing.T) {
 }
 
 func TestDeleteUserNoAuthToken(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", "/api/v1/user/777/", nil)
+	req, _ := http.NewRequest("DELETE", "/api/v1/user/6A4FE6C6-CA36-46D7-A3B4-6F73DA3F053A/", nil)
 
 	db := models.InitTestDbURI(
 		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,

@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/models"
+	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
@@ -19,9 +19,10 @@ func CreateTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	listId, _ := strconv.ParseUint(c.Params.ByName("listId"), 0, 64)
+	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
 
 	var todoList models.TodoList
 
@@ -29,8 +30,9 @@ func CreateTodo(c *gin.Context) {
 
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
-	if todoList.ID == 0 {
-		c.JSON(404, gin.H{"error": "TODO list not found"})
+	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+		c.JSON(404, gin.H{"error": "Todo list not found"})
+		return
 	}
 
 	var todo models.Todo
@@ -42,8 +44,9 @@ func CreateTodo(c *gin.Context) {
 		}
 
 		currentUser := c.MustGet("CurrentUser").(models.User)
+		todo.ID = uuid.NewV4()
 		todo.UserID = currentUser.ID
-		todo.TodoListID = uint64(listId)
+		todo.TodoListID = listId
 
 		db.Create(&todo)
 		c.JSON(201, todo)
@@ -56,9 +59,10 @@ func GetTodos(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	listId := c.Params.ByName("listId")
+	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
 
 	var todoList models.TodoList
 
@@ -66,13 +70,14 @@ func GetTodos(c *gin.Context) {
 
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
-	if todoList.ID == 0 {
-		c.JSON(404, gin.H{"error": "TODO list not found"})
+	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+		c.JSON(404, gin.H{"error": "Todo list not found"})
+		return
 	}
 
 	var todos []models.Todo
 
-	db.Order("completed asc, priority desc, id asc").Where(
+	db.Order("completed asc, priority desc, created_at asc").Where(
 		"user_id = ? AND todo_list_id = ?", currentUser.ID, listId,
 	).Find(&todos)
 
@@ -83,10 +88,11 @@ func GetTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	listId := c.Params.ByName("listId")
-	todoId := c.Params.ByName("todoId")
+	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
+	todoId := uuid.FromStringOrNil(c.Params.ByName("todoId"))
 
 	var todoList models.TodoList
 
@@ -94,15 +100,18 @@ func GetTodo(c *gin.Context) {
 
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
-	if todoList.ID == 0 {
+	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(404, gin.H{"error": "TODO list not found"})
+		return
 	}
 
 	var todo models.Todo
 
-	db.Where("user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId).Find(&todo)
+	db.Where(
+		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId,
+	).Find(&todo)
 
-	if todo.ID != 0 {
+	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(200, todo)
 	} else {
 		c.JSON(404, gin.H{"error": "Todo not found"})
@@ -113,16 +122,18 @@ func UpdateTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	listId, _ := strconv.ParseUint(c.Params.ByName("listId"), 0, 64)
-	todoId := c.Params.ByName("todoId")
+	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
+	todoId := uuid.FromStringOrNil(c.Params.ByName("todoId"))
 
 	var newTodo models.Todo
 	e := c.BindJSON(&newTodo)
 
 	if e != nil {
 		c.JSON(422, e)
+		return
 	}
 
 	var todoList models.TodoList
@@ -131,21 +142,24 @@ func UpdateTodo(c *gin.Context) {
 
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
-	if todoList.ID == 0 {
-		c.JSON(404, gin.H{"error": "TODO list not found"})
+	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+		c.JSON(404, gin.H{"error": "Todo list not found"})
+		return
 	}
 
 	var todo models.Todo
 
-	db.Where("user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId).Find(&todo)
+	db.Where(
+		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId,
+	).Find(&todo)
 
-	if todo.ID != 0 {
+	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		todo = models.Todo{
 			ID:         todo.ID,
 			Title:      newTodo.Title,
 			Completed:  newTodo.Completed,
 			Note:       newTodo.Note,
-			TodoListID: uint64(listId),
+			TodoListID: listId,
 			UserID:     todo.UserID,
 			CreatedAt:  todo.CreatedAt,
 			UpdatedAt:  time.Now(),
@@ -164,10 +178,11 @@ func DeleteTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
+		return
 	}
 
-	listId := c.Params.ByName("listId")
-	todoId := c.Params.ByName("todoId")
+	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
+	todoId := uuid.FromStringOrNil(c.Params.ByName("todoId"))
 
 	var todoList models.TodoList
 
@@ -175,15 +190,18 @@ func DeleteTodo(c *gin.Context) {
 
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
 
-	if todoList.ID == 0 {
-		c.JSON(404, gin.H{"error": "TODO list not found"})
+	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+		c.JSON(404, gin.H{"error": "Todo list not found"})
+		return
 	}
 
 	var todo models.Todo
 
-	db.Where("user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId).Find(&todo)
+	db.Where(
+		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId,
+	).Find(&todo)
 
-	if todo.ID != 0 {
+	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		db.Delete(&todo)
 
 		c.Writer.WriteHeader(204)
