@@ -9,14 +9,14 @@ import (
 	"github.com/kgantsov/todogo/models"
 )
 
+var testDBConnectionString = "postgresql://root@localhost:26257/todogo_test?sslmode=disable"
+
 func TestLogin(t *testing.T) {
 	var jsonStr = []byte(`{"email": "mike@gmail.com", "password": "111"}`)
 
 	req, _ := http.NewRequest("POST", "/api/v1/auth/login/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -93,9 +93,7 @@ func TestLoginNonExistentUser(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -113,9 +111,7 @@ func TestLoginNewUser(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/api/v1/user/", bytes.NewBuffer(jsonStr))
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -194,9 +190,7 @@ func TestLoginWithoutToken(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -236,9 +230,7 @@ func TestLoginIncorrectPassword(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)

@@ -13,8 +13,8 @@ import (
 )
 
 func hashPassword(password string) string {
-	password_hash := sha256.Sum256([]byte(password))
-	return fmt.Sprintf("%x", password_hash)
+	passwordHash := sha256.Sum256([]byte(password))
+	return fmt.Sprintf("%x", passwordHash)
 }
 
 func OptionsUser(c *gin.Context) {

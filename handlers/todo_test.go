@@ -142,9 +142,7 @@ func TestGetTodos(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -223,9 +221,7 @@ func TestGetTodosNoTodos(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -258,9 +254,7 @@ func TestGetTodosNonExistentList(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -296,9 +290,7 @@ func TestGetTodosNoAuthToken(t *testing.T) {
 		"GET", fmt.Sprintf("/api/v1/list/%s/todo/", todoLists[2].ID.String()), nil,
 	)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -324,9 +316,7 @@ func TestGetTodo(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -377,9 +367,7 @@ func TestGetTodoWrongListID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -421,9 +409,7 @@ func TestGetTodoWrongID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -463,9 +449,7 @@ func TestGetTodoNoAuthToken(t *testing.T) {
 		nil,
 	)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -491,9 +475,7 @@ func TestCreateTodo(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -581,9 +563,7 @@ func TestCreateTodoWithPriority(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -635,9 +615,7 @@ func TestCreateTodoWithDeadLine(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -685,9 +663,7 @@ func TestCreateTodoNonExistentList(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -726,9 +702,7 @@ func TestCreateTodoNoAuthToken(t *testing.T) {
 		bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -755,9 +729,7 @@ func TestUpdateTodo(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -807,9 +779,7 @@ func TestUpdateTodoWithPriority(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -862,9 +832,7 @@ func TestUpdateTodoWrongListID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -908,9 +876,7 @@ func TestUpdateTodoWrongID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -952,9 +918,7 @@ func TestUpdateTodoNoAuthToken(t *testing.T) {
 		bytes.NewBuffer(jsonStr),
 	)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -982,9 +946,7 @@ func TestUpdateTodoWrongID1(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -1026,9 +988,7 @@ func TestDeleteTodo(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -1054,9 +1014,7 @@ func TestDeleteTodoWrongListID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -1098,9 +1056,7 @@ func TestDeleteTodoWrongID(t *testing.T) {
 	token, _ := createToken(users[0].ID)
 	req.Header.Set("Auth-Token", token)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
@@ -1140,9 +1096,7 @@ func TestDeleteTodoNoAuthToken(t *testing.T) {
 		nil,
 	)
 
-	db := models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db := models.InitTestDbURI(testDBConnectionString, false)
 
 	models.DropTables(db)
 	models.CreateTables(db)
