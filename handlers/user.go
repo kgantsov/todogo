@@ -89,18 +89,18 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	userId := uuid.FromStringOrNil(c.Params.ByName("userId"))
+	userID := uuid.FromStringOrNil(c.Params.ByName("userID"))
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if userId != currentUser.ID {
+	if userID != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
 		return
 	}
 
 	var user models.User
 
-	db.Where("id = ?", userId).First(&user)
+	db.Where("id = ?", userID).First(&user)
 
 	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(200, user)
@@ -116,11 +116,11 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	userId := uuid.FromStringOrNil(c.Params.ByName("userId"))
+	userID := uuid.FromStringOrNil(c.Params.ByName("userID"))
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if userId != currentUser.ID {
+	if userID != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
 		return
 	}
@@ -140,7 +140,7 @@ func UpdateUser(c *gin.Context) {
 
 	var user models.User
 
-	db.Where("id = ?", userId).First(&user)
+	db.Where("id = ?", userID).First(&user)
 
 	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		user = models.User{
@@ -167,18 +167,18 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	userId := uuid.FromStringOrNil(c.Params.ByName("userId"))
+	userID := uuid.FromStringOrNil(c.Params.ByName("userID"))
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	if userId != currentUser.ID {
+	if userID != currentUser.ID {
 		c.JSON(403, gin.H{"error": "Access denied"})
 		return
 	}
 
 	var user models.User
 
-	db.Where("id = ?", userId).First(&user)
+	db.Where("id = ?", userID).First(&user)
 
 	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		db.Delete(&user)

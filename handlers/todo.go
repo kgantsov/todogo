@@ -22,13 +22,13 @@ func CreateTodo(c *gin.Context) {
 		return
 	}
 
-	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
+	listID := uuid.FromStringOrNil(c.Params.ByName("listID"))
 
 	var todoList models.TodoList
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(404, gin.H{"error": "Todo list not found"})
@@ -46,7 +46,7 @@ func CreateTodo(c *gin.Context) {
 		currentUser := c.MustGet("CurrentUser").(models.User)
 		todo.ID = uuid.NewV4()
 		todo.UserID = currentUser.ID
-		todo.TodoListID = listId
+		todo.TodoListID = listID
 
 		db.Create(&todo)
 		c.JSON(201, todo)
@@ -62,13 +62,13 @@ func GetTodos(c *gin.Context) {
 		return
 	}
 
-	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
+	listID := uuid.FromStringOrNil(c.Params.ByName("listID"))
 
 	var todoList models.TodoList
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(404, gin.H{"error": "Todo list not found"})
@@ -78,7 +78,7 @@ func GetTodos(c *gin.Context) {
 	var todos []models.Todo
 
 	db.Order("completed asc, priority desc, created_at asc").Where(
-		"user_id = ? AND todo_list_id = ?", currentUser.ID, listId,
+		"user_id = ? AND todo_list_id = ?", currentUser.ID, listID,
 	).Find(&todos)
 
 	c.JSON(200, todos)
@@ -91,14 +91,14 @@ func GetTodo(c *gin.Context) {
 		return
 	}
 
-	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
-	todoId := uuid.FromStringOrNil(c.Params.ByName("todoId"))
+	listID := uuid.FromStringOrNil(c.Params.ByName("listID"))
+	todoID := uuid.FromStringOrNil(c.Params.ByName("todoID"))
 
 	var todoList models.TodoList
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(404, gin.H{"error": "TODO list not found"})
@@ -108,7 +108,7 @@ func GetTodo(c *gin.Context) {
 	var todo models.Todo
 
 	db.Where(
-		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId,
+		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listID, todoID,
 	).Find(&todo)
 
 	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
@@ -125,8 +125,8 @@ func UpdateTodo(c *gin.Context) {
 		return
 	}
 
-	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
-	todoId := uuid.FromStringOrNil(c.Params.ByName("todoId"))
+	listID := uuid.FromStringOrNil(c.Params.ByName("listID"))
+	todoID := uuid.FromStringOrNil(c.Params.ByName("todoID"))
 
 	var newTodo models.Todo
 	e := c.BindJSON(&newTodo)
@@ -140,7 +140,7 @@ func UpdateTodo(c *gin.Context) {
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(404, gin.H{"error": "Todo list not found"})
@@ -150,7 +150,7 @@ func UpdateTodo(c *gin.Context) {
 	var todo models.Todo
 
 	db.Where(
-		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId,
+		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listID, todoID,
 	).Find(&todo)
 
 	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
@@ -159,7 +159,7 @@ func UpdateTodo(c *gin.Context) {
 			Title:      newTodo.Title,
 			Completed:  newTodo.Completed,
 			Note:       newTodo.Note,
-			TodoListID: listId,
+			TodoListID: listID,
 			UserID:     todo.UserID,
 			CreatedAt:  todo.CreatedAt,
 			UpdatedAt:  time.Now(),
@@ -181,14 +181,14 @@ func DeleteTodo(c *gin.Context) {
 		return
 	}
 
-	listId := uuid.FromStringOrNil(c.Params.ByName("listId"))
-	todoId := uuid.FromStringOrNil(c.Params.ByName("todoId"))
+	listID := uuid.FromStringOrNil(c.Params.ByName("listID"))
+	todoID := uuid.FromStringOrNil(c.Params.ByName("todoID"))
 
 	var todoList models.TodoList
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("user_id = ? AND id = ?", currentUser.ID, listId).First(&todoList)
+	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(404, gin.H{"error": "Todo list not found"})
@@ -198,7 +198,7 @@ func DeleteTodo(c *gin.Context) {
 	var todo models.Todo
 
 	db.Where(
-		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listId, todoId,
+		"user_id = ? AND todo_list_id = ? AND id = ?", currentUser.ID, listID, todoID,
 	).Find(&todo)
 
 	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {

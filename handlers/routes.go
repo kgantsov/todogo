@@ -30,12 +30,12 @@ func DefineRoutes(db *gorm.DB, r *gin.Engine) {
 	v1 := r.Group("api/v1")
 	{
 		v1.OPTIONS("/user/", OptionsUser)
-		v1.OPTIONS("/user/:userId/", OptionsUser)
+		v1.OPTIONS("/user/:userID/", OptionsUser)
 		v1.OPTIONS("/auth/login/", OptionsLogin)
 		v1.OPTIONS("/list/", OptionsTodoList)
-		v1.OPTIONS("/list/:listId/", OptionsTodoList)
-		v1.OPTIONS("/list/:listId/todo/", OptionsTodo)
-		v1.OPTIONS("/list/:listId/todo/:todoId/", OptionsTodo)
+		v1.OPTIONS("/list/:listID/", OptionsTodoList)
+		v1.OPTIONS("/list/:listID/todo/", OptionsTodo)
+		v1.OPTIONS("/list/:listID/todo/:todoID/", OptionsTodo)
 
 		v1.POST("/user/", CreateUser)
 		v1.POST("/auth/login/", Login)
@@ -43,21 +43,21 @@ func DefineRoutes(db *gorm.DB, r *gin.Engine) {
 		v1.Use(AuthMiddleware(db))
 		{
 			v1.GET("/user/", GetUsers)
-			v1.GET("/user/:userId/", GetUser)
-			v1.PUT("/user/:userId/", UpdateUser)
-			v1.DELETE("/user/:userId/", DeleteUser)
+			v1.GET("/user/:userID/", GetUser)
+			v1.PUT("/user/:userID/", UpdateUser)
+			v1.DELETE("/user/:userID/", DeleteUser)
 
 			v1.POST("/list/", CreateTodoList)
 			v1.GET("/list/", GetTodoLists)
-			v1.GET("/list/:listId/", GetTodoList)
-			v1.PUT("/list/:listId/", UpdateTodoList)
-			v1.DELETE("/list/:listId/", DeleteTodoList)
+			v1.GET("/list/:listID/", GetTodoList)
+			v1.PUT("/list/:listID/", UpdateTodoList)
+			v1.DELETE("/list/:listID/", DeleteTodoList)
 
-			v1.POST("/list/:listId/todo/", CreateTodo)
-			v1.GET("/list/:listId/todo/", GetTodos)
-			v1.GET("/list/:listId/todo/:todoId/", GetTodo)
-			v1.PUT("/list/:listId/todo/:todoId/", UpdateTodo)
-			v1.DELETE("/list/:listId/todo/:todoId/", DeleteTodo)
+			v1.POST("/list/:listID/todo/", CreateTodo)
+			v1.GET("/list/:listID/todo/", GetTodos)
+			v1.GET("/list/:listID/todo/:todoID/", GetTodo)
+			v1.PUT("/list/:listID/todo/:todoID/", UpdateTodo)
+			v1.DELETE("/list/:listID/todo/:todoID/", DeleteTodo)
 		}
 	}
 }

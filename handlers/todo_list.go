@@ -60,13 +60,13 @@ func GetTodoList(c *gin.Context) {
 		return
 	}
 
-	listId := c.Params.ByName("listId")
+	listID := c.Params.ByName("listID")
 
 	var todoList models.TodoList
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("id = ? AND user_id = ?", listId, currentUser.ID).First(&todoList)
+	db.Where("id = ? AND user_id = ?", listID, currentUser.ID).First(&todoList)
 
 	if todoList.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(200, todoList)
@@ -82,7 +82,7 @@ func UpdateTodoList(c *gin.Context) {
 		return
 	}
 
-	listId := c.Params.ByName("listId")
+	listID := c.Params.ByName("listID")
 
 	var newTodoList models.TodoList
 	e := c.BindJSON(&newTodoList)
@@ -96,7 +96,7 @@ func UpdateTodoList(c *gin.Context) {
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("id = ? AND user_id = ?", listId, currentUser.ID).First(&todoList)
+	db.Where("id = ? AND user_id = ?", listID, currentUser.ID).First(&todoList)
 
 	if todoList.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		todoList = models.TodoList{
@@ -121,13 +121,13 @@ func DeleteTodoList(c *gin.Context) {
 		return
 	}
 
-	listId := c.Params.ByName("listId")
+	listID := c.Params.ByName("listID")
 
 	var todoList models.TodoList
 
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
-	db.Where("id = ? AND user_id = ?", listId, currentUser.ID).First(&todoList)
+	db.Where("id = ? AND user_id = ?", listID, currentUser.ID).First(&todoList)
 
 	if todoList.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		db.Delete(&todoList)

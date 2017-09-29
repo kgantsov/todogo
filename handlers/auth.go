@@ -55,9 +55,9 @@ func Login(c *gin.Context) {
 	c.JSON(401, gin.H{"error": "Login or password is incorrect"})
 }
 
-func createToken(userId uuid.UUID) (string, error) {
+func createToken(userID uuid.UUID) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userId.String(),
+		"user_id": userID.String(),
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -79,9 +79,9 @@ func validateToken(db *gorm.DB, tokenString string) (models.User, bool) {
 
 	if err == nil {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			userId, _ := claims["user_id"].(string)
+			userID, _ := claims["user_id"].(string)
 
-			db.Where("id = ?", userId).First(&user)
+			db.Where("id = ?", userID).First(&user)
 
 			if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 				return user, true
