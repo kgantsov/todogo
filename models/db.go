@@ -70,7 +70,7 @@ func CreateTables(db *gorm.DB) {
 
 	if !db.HasTable(&TodoList{}) {
 		db.CreateTable(&TodoList{})
-		db.Model(&Todo{}).AddForeignKey(
+		db.Model(&TodoList{}).AddForeignKey(
 			"user_id", "users(id)", "CASCADE", "RESTRICT",
 		)
 	}
