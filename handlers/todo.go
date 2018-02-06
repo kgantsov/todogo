@@ -154,6 +154,7 @@ func UpdateTodo(c *gin.Context) {
 	).Find(&todo)
 
 	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+		updatedAt := time.Now()
 		todo = models.Todo{
 			ID:         todo.ID,
 			Title:      newTodo.Title,
@@ -162,7 +163,7 @@ func UpdateTodo(c *gin.Context) {
 			TodoListID: listID,
 			UserID:     todo.UserID,
 			CreatedAt:  todo.CreatedAt,
-			UpdatedAt:  time.Now(),
+			UpdatedAt:  &updatedAt,
 			DeadLineAt: newTodo.DeadLineAt,
 			Priority:   newTodo.Priority,
 		}

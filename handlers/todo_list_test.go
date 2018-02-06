@@ -29,37 +29,37 @@ var todoLists = []models.TodoList{
 		ID:        uuid.NewV4(),
 		Title:     "Shopping list",
 		UserID:    users[0].ID,
-		CreatedAt: time.Now().Add(time.Second * 2),
+		CreatedAt: ptr(time.Now().Add(time.Second * 2)),
 	},
 	{
 		ID:        uuid.NewV4(),
 		Title:     "Work list",
 		UserID:    users[0].ID,
-		CreatedAt: time.Now().Add(time.Second * 3),
+		CreatedAt: ptr(time.Now().Add(time.Second * 3)),
 	},
 	{
 		ID:        uuid.NewV4(),
 		Title:     "Sport list",
 		UserID:    users[0].ID,
-		CreatedAt: time.Now().Add(time.Second * 4),
+		CreatedAt: ptr(time.Now().Add(time.Second * 4)),
 	},
 	{
 		ID:        uuid.NewV4(),
 		Title:     "Todo project",
 		UserID:    users[1].ID,
-		CreatedAt: time.Now().Add(time.Second * 5),
+		CreatedAt: ptr(time.Now().Add(time.Second * 5)),
 	},
 	{
 		ID:        uuid.NewV4(),
 		Title:     "Foogle project",
 		UserID:    users[1].ID,
-		CreatedAt: time.Now().Add(time.Second * 6),
+		CreatedAt: ptr(time.Now().Add(time.Second * 6)),
 	},
 	{
 		ID:        uuid.NewV4(),
 		Title:     "Sport list",
 		UserID:    users[2].ID,
-		CreatedAt: time.Now().Add(time.Second * 7),
+		CreatedAt: ptr(time.Now().Add(time.Second * 7)),
 	},
 }
 

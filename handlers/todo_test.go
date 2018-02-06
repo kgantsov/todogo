@@ -23,7 +23,7 @@ var shoppingTodos = []models.Todo{
 		TodoListID: todoLists[0].ID,
 		UserID:     users[0].ID,
 		Priority:   models.PRIORITY_NORMAL,
-		CreatedAt:  time.Now().Add(time.Second * 2),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 2)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -33,7 +33,7 @@ var shoppingTodos = []models.Todo{
 		TodoListID: todoLists[0].ID,
 		UserID:     users[0].ID,
 		Priority:   models.PRIORITY_NORMAL,
-		CreatedAt:  time.Now().Add(time.Second * 3),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 3)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -43,7 +43,7 @@ var shoppingTodos = []models.Todo{
 		TodoListID: todoLists[0].ID,
 		UserID:     users[0].ID,
 		Priority:   models.PRIORITY_NORMAL,
-		CreatedAt:  time.Now().Add(time.Second * 4),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 4)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -53,7 +53,7 @@ var shoppingTodos = []models.Todo{
 		TodoListID: todoLists[0].ID,
 		UserID:     users[0].ID,
 		Priority:   models.PRIORITY_URGENT,
-		CreatedAt:  time.Now().Add(time.Second * 5),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 5)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -63,7 +63,7 @@ var shoppingTodos = []models.Todo{
 		TodoListID: todoLists[0].ID,
 		UserID:     users[0].ID,
 		Priority:   models.PRIORITY_HIGH,
-		CreatedAt:  time.Now().Add(time.Second * 6),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 6)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -73,7 +73,7 @@ var shoppingTodos = []models.Todo{
 		TodoListID: todoLists[0].ID,
 		UserID:     users[0].ID,
 		Priority:   models.PRIORITY_NORMAL,
-		CreatedAt:  time.Now().Add(time.Second * 7),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 7)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -83,7 +83,7 @@ var shoppingTodos = []models.Todo{
 		TodoListID: todoLists[0].ID,
 		UserID:     users[0].ID,
 		Priority:   models.PRIORITY_NORMAL,
-		CreatedAt:  time.Now().Add(time.Second * 8),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 8)),
 	},
 }
 
@@ -95,7 +95,7 @@ var workTodos = []models.Todo{
 		Note:       "",
 		TodoListID: todoLists[1].ID,
 		UserID:     users[0].ID,
-		CreatedAt:  time.Now().Add(time.Second * 9),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 9)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -104,7 +104,7 @@ var workTodos = []models.Todo{
 		Note:       "",
 		TodoListID: todoLists[1].ID,
 		UserID:     users[0].ID,
-		CreatedAt:  time.Now().Add(time.Second * 10),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 10)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -113,7 +113,7 @@ var workTodos = []models.Todo{
 		Note:       "",
 		TodoListID: todoLists[1].ID,
 		UserID:     users[0].ID,
-		CreatedAt:  time.Now().Add(time.Second * 11),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 11)),
 	},
 	{
 		ID:         uuid.NewV4(),
@@ -122,8 +122,12 @@ var workTodos = []models.Todo{
 		Note:       "",
 		TodoListID: todoLists[1].ID,
 		UserID:     users[0].ID,
-		CreatedAt:  time.Now().Add(time.Second * 12),
+		CreatedAt:  ptr(time.Now().Add(time.Second * 12)),
 	},
+}
+
+func ptr(t time.Time) *time.Time {
+	return &t
 }
 
 func CreateTodoFixtures(db *gorm.DB) {
@@ -189,7 +193,7 @@ func TestGetTodos(t *testing.T) {
 			return true
 		}
 
-		return shoppingTodos[i].CreatedAt.Before(shoppingTodos[j].CreatedAt)
+		return shoppingTodos[i].CreatedAt.Before(*shoppingTodos[j].CreatedAt)
 	})
 
 	for i := range shoppingTodos {
@@ -649,7 +653,7 @@ func TestCreateTodoWithDeadLine(t *testing.T) {
 	if res.TodoListID != todoLists[0].ID {
 		t.Errorf("Response body should be `%v`, was %v", todoLists[0].ID, res.TodoListID)
 	}
-	if res.DeadLineAt != time.Date(2009, 11, 17, 20, 34, 58, 0, time.UTC) {
+	if *res.DeadLineAt != time.Date(2009, 11, 17, 20, 34, 58, 0, time.UTC) {
 		t.Errorf("Response body should be `1`, was %s", res.DeadLineAt)
 	}
 }

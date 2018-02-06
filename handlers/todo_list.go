@@ -99,11 +99,12 @@ func UpdateTodoList(c *gin.Context) {
 	db.Where("id = ? AND user_id = ?", listID, currentUser.ID).First(&todoList)
 
 	if todoList.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+		updatedAt := time.Now()
 		todoList = models.TodoList{
 			ID:        todoList.ID,
 			Title:     newTodoList.Title,
 			CreatedAt: todoList.CreatedAt,
-			UpdatedAt: time.Now(),
+			UpdatedAt: &updatedAt,
 		}
 
 		db.Save(&todoList)

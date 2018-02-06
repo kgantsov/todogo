@@ -143,13 +143,14 @@ func UpdateUser(c *gin.Context) {
 	db.Where("id = ?", userID).First(&user)
 
 	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+		updatedAt := time.Now()
 		user = models.User{
 			ID:        user.ID,
 			Name:      newUser.Name,
 			Email:     newUser.Email,
 			Password:  hashPassword(newUser.Password),
 			CreatedAt: user.CreatedAt,
-			UpdatedAt: time.Now(),
+			UpdatedAt: &updatedAt,
 		}
 
 		db.Save(&user)
