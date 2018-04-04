@@ -14,22 +14,43 @@ services:
     ports:
       - "8080:8080"
     links:
-      - postgres:postgres
+      # - postgres:postgres
+      - cockroach:cockroach
     depends_on:
-      - postgres
+      # - postgres
+      - cockroach
     command: /go/src/github.com/kgantsov/todogo/todogo
 
-  postgres:
-    container_name: postgres
+#  postgres:
+#    container_name: postgres
+#    restart: always
+#    build: ./docker/postgres
+#    volumes:
+#      - postgresdatavolume:/var/lib/postgresql
+#    ports:
+#      - "5432:5432"
+#    expose:
+#      - "5432/tcp"
+
+  cockroach:
+    container_name: cockroach
     restart: always
-    build: ./docker/postgres
+    image: cockroachdb/cockroach:latest
     volumes:
-      - postgresdatavolume:/var/lib/postgresql
+      - cockroachdatavolume:/cockroach/cockroach-data
     ports:
-      - "5432:5432"
+      - "26257:26257"
     expose:
-      - "5432/tcp"
+      - "26257/tcp"
+    command: start --insecure
+  
+  psql:
+    container_name: psql
+    
+    image: jbergknoff/postgresql-client
 
 volumes:
   postgresdatavolume:
+    driver: local
+  cockroachdatavolume:
     driver: local
