@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/kgantsov/todogo/models"
+	"github.com/kgantsov/todogo/pkg/models"
 )
 
 var testDBConnectionString = "postgresql://root@localhost:26257/todogo_test?sslmode=disable"

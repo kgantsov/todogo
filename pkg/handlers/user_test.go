@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/jinzhu/gorm"
-	"github.com/kgantsov/todogo/models"
+	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
 )
 

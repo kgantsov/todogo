@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/kgantsov/todogo/models"
+	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 	"gopkg.in/gin-gonic/gin.v1"
