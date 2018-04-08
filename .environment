@@ -3,4 +3,6 @@ DB_HOST=postgres
 DB_NAME=todogo
 DB_USERNAME=todogo
 DB_PASSWORD=todogowassword
-DB_URI=postgresql://todogo:todogowassword@postgres:5432/todogo
+DB_PORT=5432
+
+DB_URI=postgresql://root@cockroach:26257/todogo?sslmode=disable

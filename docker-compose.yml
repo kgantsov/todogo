@@ -44,10 +44,10 @@ services:
       - "26257/tcp"
     command: start --insecure
   
-  psql:
-    container_name: psql
+  # psql:
+  #   container_name: psql
     
-    image: jbergknoff/postgresql-client
+  #   image: jbergknoff/postgresql-client
 
 volumes:
   postgresdatavolume:
