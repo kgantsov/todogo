@@ -57,7 +57,13 @@ func main() {
 	r := gin.New()
 
 	r.Use(gin.Recovery())
-	r.Use(NewRelicMiddleware(os.Getenv("NEWRELIC_APP_NAME"), os.Getenv("NEWRELIC_APP_KEY")))
+
+	NewrelicAppName := os.Getenv("NEWRELIC_APP_NAME")
+	NewrelicAppKey := os.Getenv("NEWRELIC_APP_KEY")
+
+	if len(NewrelicAppName) > 0 && len(NewrelicAppKey) > 0 {
+		r.Use(NewRelicMiddleware(os.Getenv("NEWRELIC_APP_NAME"), os.Getenv("NEWRELIC_APP_KEY")))
+	}
 
 	if *debug {
 		r.Use(gin.Logger())
