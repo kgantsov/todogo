@@ -9,7 +9,10 @@
 
 [[projects]]
   name = "github.com/gin-gonic/gin"
-  packages = ["binding","render"]
+  packages = [
+    "binding",
+    "render"
+  ]
   revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
   version = "v1.2"
 
@@ -18,6 +21,24 @@
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
+
+[[projects]]
+  name = "github.com/graphql-go/graphql"
+  packages = [
+    ".",
+    "gqlerrors",
+    "language/ast",
+    "language/kinds",
+    "language/lexer",
+    "language/location",
+    "language/parser",
+    "language/printer",
+    "language/source",
+    "language/typeInfo",
+    "language/visitor"
+  ]
+  revision = "1e23489041ba90a66f317fe0deccb236a2fff3cb"
+  version = "v0.7.5"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -34,7 +55,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/lib/pq"
-  packages = [".","oid"]
+  packages = [
+    ".",
+    "oid"
+  ]
   revision = "b609790bd85edf8e9ab7e0f8912750a786177bcf"
 
 [[projects]]
@@ -45,7 +69,14 @@
 
 [[projects]]
   name = "github.com/newrelic/go-agent"
-  packages = [".","internal","internal/jsonx","internal/logger","internal/sysinfo","internal/utilization"]
+  packages = [
+    ".",
+    "internal",
+    "internal/jsonx",
+    "internal/logger",
+    "internal/sysinfo",
+    "internal/utilization"
+  ]
   revision = "462a146a1270954750aac98c5b3e83dec6a9adfd"
   version = "v1.10.0"
 
@@ -64,13 +95,20 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp"]
+  packages = [
+    "context",
+    "context/ctxhttp"
+  ]
   revision = "ea0da6f35caf3ff91581c800469e22eef75076f4"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/oauth2"
-  packages = [".","facebook","internal"]
+  packages = [
+    ".",
+    "facebook",
+    "internal"
+  ]
   revision = "bb50c06baba3d0c76f9d125c0719093e315b5b44"
 
 [[projects]]
@@ -81,7 +119,15 @@
 
 [[projects]]
   name = "google.golang.org/appengine"
-  packages = ["internal","internal/base","internal/datastore","internal/log","internal/remote_api","internal/urlfetch","urlfetch"]
+  packages = [
+    "internal",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch"
+  ]
   revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
   version = "v1.0.0"
 
@@ -112,6 +158,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8a42862694d2d742770bfee70494edc4a5f50ae74233323a81367bcc06df11b8"
+  inputs-digest = "a9c7ed68c5d35910046db6b706aa0991d5f0055807a91bbc434d0864c47c82cd"
   solver-name = "gps-cdcl"
   solver-version = 1

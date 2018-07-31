@@ -60,4 +60,12 @@ func DefineRoutes(db *gorm.DB, r *gin.Engine) {
 			v1.DELETE("/list/:listID/todo/:todoID/", DeleteTodo)
 		}
 	}
+
+	graphqlV1 := r.Group("graphql")
+	{
+		graphqlV1.Use(AuthMiddleware(db))
+		{
+			graphqlV1.GET("/user/", UserGraphql)
+		}
+	}
 }
