@@ -66,6 +66,7 @@ func DefineRoutes(db *gorm.DB, r *gin.Engine) {
 		graphqlV1.Use(AuthMiddleware(db))
 		{
 			graphqlV1.GET("/user/", UserGraphql)
+			graphqlV1.GET("/list/", TodoListGraphql)
 		}
 	}
 }

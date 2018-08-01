@@ -10,7 +10,7 @@ import (
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
-func UserGraphql(c *gin.Context) {
+func TodoListGraphql(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
 		c.JSON(500, gin.H{"error": "No connection to DB"})
@@ -21,9 +21,9 @@ func UserGraphql(c *gin.Context) {
 		graphql.ObjectConfig{
 			Name: "Query",
 			Fields: graphql.Fields{
-				"user": &graphql.Field{
-					Type:        models.UserType,
-					Description: "Get user by id",
+				"todo_list": &graphql.Field{
+					Type:        models.TodoListType,
+					Description: "Get todo_list by id",
 					Args: graphql.FieldConfigArgument{
 						"id": &graphql.ArgumentConfig{
 							Type: graphql.String,
@@ -33,32 +33,28 @@ func UserGraphql(c *gin.Context) {
 						id, _ := p.Args["id"].(string)
 
 						currentUser := c.MustGet("CurrentUser").(models.User)
-						var user models.User
 
-						if uuid.FromStringOrNil(id) != currentUser.ID {
-							c.JSON(403, gin.H{"error": "Access denied"})
-							return nil, errors.New("User not found")
+						var todoList models.TodoList
+
+						db.Where("id = ? AND user_id = ?", id, currentUser.ID).First(&todoList)
+
+						if todoList.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
+							return todoList, nil
 						}
-
-						db.Where("id = ?", id).First(&user)
-
-						if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-							return user, nil
-						}
-						return nil, errors.New("User not found")
+						return nil, errors.New("TodoList not found")
 					},
 				},
 				"list": &graphql.Field{
-					Type:        graphql.NewList(models.UserType),
-					Description: "Get user list",
+					Type:        graphql.NewList(models.TodoListType),
+					Description: "Get list of todo_list",
 					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 
-						var users []models.User
+						var todoLists []models.TodoList
 
 						currentUser := c.MustGet("CurrentUser").(models.User)
 
-						db.Order("id asc").Where("id = ?", currentUser.ID).Find(&users)
-						return users, nil
+						db.Order("created_at asc").Where("user_id = ?", currentUser.ID).Find(&todoLists)
+						return todoLists, nil
 					},
 				},
 			},
