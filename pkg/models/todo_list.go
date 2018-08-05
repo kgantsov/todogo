@@ -32,22 +32,25 @@ var TodoListType = graphql.NewObject(
 			"updated_at": &graphql.Field{
 				Type: graphql.String,
 			},
-			"user": &graphql.Field{
-				Type:        UserType,
-				Description: "Get TodoList user",
-				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					var user User
-
-					db := params.Context.Value("db").(*gorm.DB)
-					// if db := params.Context.Value(k); v != nil {
-					// 	fmt.Println("found value:", v)
-					// 	return
-					// }
-
-					db.Order("id asc").Where("id = ?", params.Source.(TodoList).UserID).First(&user)
-					return user, nil
-				},
-			},
 		},
 	},
 )
+
+func init() {
+	TodoListType.AddFieldConfig("user", &graphql.Field{
+		Type:        UserType,
+		Description: "Get TodoList user",
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			var user User
+
+			db := params.Context.Value("db").(*gorm.DB)
+			// if db := params.Context.Value(k); v != nil {
+			// 	fmt.Println("found value:", v)
+			// 	return
+			// }
+
+			db.Order("id asc").Where("id = ?", params.Source.(TodoList).UserID).First(&user)
+			return user, nil
+		},
+	})
+}
