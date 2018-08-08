@@ -44,10 +44,6 @@ func init() {
 			var user User
 
 			db := params.Context.Value("db").(*gorm.DB)
-			// if db := params.Context.Value(k); v != nil {
-			// 	fmt.Println("found value:", v)
-			// 	return
-			// }
 
 			db.Order("id asc").Where("id = ?", params.Source.(TodoList).UserID).First(&user)
 			return user, nil
@@ -60,10 +56,6 @@ func init() {
 			var todos []Todo
 
 			db := params.Context.Value("db").(*gorm.DB)
-			// if db := params.Context.Value(k); v != nil {
-			// 	fmt.Println("found value:", v)
-			// 	return
-			// }
 
 			db.Order("created_at asc").Where("todo_list_id = ?", params.Source.(TodoList).ID).Find(&todos)
 			return todos, nil
