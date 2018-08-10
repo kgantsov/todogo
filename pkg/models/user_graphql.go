@@ -36,12 +36,6 @@ func init() {
 			var todoList []TodoList
 
 			db := params.Context.Value("db").(*gorm.DB)
-			// if db := params.Context.Value(k); v != nil {
-			// 	fmt.Println("found value:", v)
-			// 	return
-			// }
-
-			// db = db.(gorm.DB)
 
 			db.Order("id asc").Where("user_id = ?", params.Source.(User).ID).Find(&todoList)
 			return todoList, nil
