@@ -46,7 +46,10 @@ func init() {
 
 			db := params.Context.Value("db").(*gorm.DB)
 
-			db.Order("created_at asc").Where("todo_list_id = ?", params.Source.(TodoList).ID).Find(&todos)
+			db.Order("created_at asc").Where(
+				"todo_list_id = ?",
+				params.Source.(TodoList).ID,
+			).Find(&todos)
 			return todos, nil
 		},
 	})
