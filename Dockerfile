@@ -26,4 +26,4 @@ COPY --from=alpine /zoneinfo.zip /
 
 COPY --from=builder /app /
 COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-ENTRYPOINT ["/app --port 8780"]
+CMD ["/app --port 8780"]
