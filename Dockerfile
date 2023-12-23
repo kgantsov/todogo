@@ -19,7 +19,7 @@ WORKDIR /usr/share/zoneinfo
 # tz loader doesn't handle compressed data.
 RUN zip -r -0 /zoneinfo.zip .
 
-FROM scratch
+FROM alpine
 
 ENV ZONEINFO /zoneinfo.zip
 COPY --from=alpine /zoneinfo.zip /
