@@ -1,4 +1,4 @@
-FROM golang:1.9 AS builder
+FROM golang:1.21.1 AS builder
 
 
 # Copy the code from the host and compile it
