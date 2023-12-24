@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
+	"gorm.io/gorm"
 )
 
 func DBMiddleware(db gorm.DB) gin.HandlerFunc {

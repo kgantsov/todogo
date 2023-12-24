@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/jinzhu/gorm"
 	"gopkg.in/gin-gonic/gin.v1"
+	"gorm.io/gorm"
 )
 
 func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {

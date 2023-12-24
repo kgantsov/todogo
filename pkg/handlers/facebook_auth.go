@@ -46,7 +46,7 @@ func FacebookLoginCallback(c *gin.Context) {
 	code := c.Request.URL.Query().Get("code")
 	token, err := googleOauthConfig.Exchange(context.Background(), code)
 	if err != nil {
-		fmt.Println("Code exchange failed with '%s'\n", err)
+		fmt.Printf("Code exchange failed with '%s'\n", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 

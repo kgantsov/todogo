@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/graphql-go/graphql"
-	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
+	"gorm.io/gorm"
 )
 
 func UserGraphql(c *gin.Context) {

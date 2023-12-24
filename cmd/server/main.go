@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/pkg/handlers"
 	"github.com/kgantsov/todogo/pkg/models"
-	"github.com/newrelic/go-agent"
+	newrelic "github.com/newrelic/go-agent"
 	"gopkg.in/gin-gonic/gin.v1"
+	"gorm.io/gorm"
 )
 
 func DBMiddleware(db gorm.DB) gin.HandlerFunc {

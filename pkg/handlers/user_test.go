@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 var users = []models.User{

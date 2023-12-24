@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 var UserType = graphql.NewObject(

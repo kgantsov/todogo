@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/graphql-go/graphql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func executeQuery(db *gorm.DB, query string, schema graphql.Schema) *graphql.Result {

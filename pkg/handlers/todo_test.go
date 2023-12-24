@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 var shoppingTodos = []models.Todo{
@@ -543,7 +543,7 @@ func TestCreateTodo(t *testing.T) {
 		t.Errorf("Response body should be `%s`, was  %s", todo.Title, res.Title)
 	}
 	if res.Completed != todo.Completed {
-		t.Errorf("Response body should be `%s`, was  %s", todo.Completed, res.Completed)
+		t.Errorf("Response body should be `%t`, was  %t", todo.Completed, res.Completed)
 	}
 	if res.Note != todo.Note {
 		t.Errorf("Response body should be `%s`, was  %s", todo.Note, res.Note)

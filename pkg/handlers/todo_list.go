@@ -3,10 +3,10 @@ package handlers
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
+	"gorm.io/gorm"
 )
 
 func OptionsTodoList(c *gin.Context) {
