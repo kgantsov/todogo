@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -341,9 +342,7 @@ func TestCreateTodoList(t *testing.T) {
 	req, _ = http.NewRequest("GET", fmt.Sprintf("/api/v1/list/%s/", todoList.ID.String()), nil)
 	req.Header.Set("Auth-Token", token)
 
-	db = models.InitTestDbURI(
-		"postgresql://root@localhost:26257/todogo_test?sslmode=disable", false,
-	)
+	db = models.InitTestDbURI(os.Getenv("DB_TEST_URI"), false)
 
 	resp = ExecuteRequest(db, req)
 

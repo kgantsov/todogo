@@ -68,32 +68,32 @@ func InitTestDbURI(connectionString string, debug bool) *gorm.DB {
 }
 
 func CreateTables(db *gorm.DB) {
-	// if !db.HasTable(&User{}) {
-	// 	db.CreateTable(&User{})
-	// }
+	if !db.Migrator().HasTable(&User{}) {
+		db.Migrator().CreateTable(&User{})
+	}
 
-	// if !db.HasTable(&TodoList{}) {
-	// 	db.CreateTable(&TodoList{})
-	// 	db.Model(&TodoList{}).AddForeignKey(
-	// 		"user_id", "users(id)", "CASCADE", "RESTRICT",
-	// 	)
-	// }
+	if !db.Migrator().HasTable(&TodoList{}) {
+		db.Migrator().CreateTable(&TodoList{})
+		// db.Model(&TodoList{}).AddForeignKey(
+		// 	"user_id", "users(id)", "CASCADE", "RESTRICT",
+		// )
+	}
 
-	// if !db.HasTable(&Todo{}) {
-	// 	db.CreateTable(&Todo{})
-	// 	db.Model(&Todo{}).AddForeignKey(
-	// 		"user_id", "users(id)", "CASCADE", "RESTRICT",
-	// 	)
-	// 	db.Model(&Todo{}).AddForeignKey(
-	// 		"todo_list_id", "todo_lists(id)", "CASCADE", "RESTRICT",
-	// 	)
-	// }
+	if !db.Migrator().HasTable(&Todo{}) {
+		db.Migrator().CreateTable(&Todo{})
+		// db.Model(&Todo{}).AddForeignKey(
+		// 	"user_id", "users(id)", "CASCADE", "RESTRICT",
+		// )
+		// db.Model(&Todo{}).AddForeignKey(
+		// 	"todo_list_id", "todo_lists(id)", "CASCADE", "RESTRICT",
+		// )
+	}
 
 	db.AutoMigrate(&User{}, &TodoList{}, &Todo{})
 }
 
 func DropTables(db *gorm.DB) {
-	db.Delete(&User{})
-	db.Delete(&TodoList{})
-	db.Delete(&Todo{})
+	db.Migrator().DropTable(&User{})
+	db.Migrator().DropTable(&TodoList{})
+	db.Migrator().DropTable(&Todo{})
 }

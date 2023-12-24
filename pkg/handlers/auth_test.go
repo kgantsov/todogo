@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/kgantsov/todogo/pkg/models"
 )
 
-var testDBConnectionString = "postgresql://root@localhost:26257/todogo_test?sslmode=disable"
+var testDBConnectionString = os.Getenv("DB_TEST_URI")
 
 func TestLogin(t *testing.T) {
 	var jsonStr = []byte(`{"email": "mike@gmail.com", "password": "111"}`)
