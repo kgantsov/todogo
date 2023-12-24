@@ -3,8 +3,6 @@ FROM golang:1.9 AS builder
 
 # Copy the code from the host and compile it
 WORKDIR $GOPATH/src/github.com/kgantsov/todogo
-COPY Gopkg.toml Gopkg.lock ./
-RUN dep ensure --vendor-only
 COPY ./ ./
 RUN go mod download
 WORKDIR $GOPATH/src/github.com/kgantsov/todogo/cmd/server
