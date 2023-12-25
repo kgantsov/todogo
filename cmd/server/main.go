@@ -11,7 +11,7 @@ import (
 	newrelic "github.com/newrelic/go-agent"
 	"gorm.io/gorm"
 
-	"github.com/zsais/go-gin-prometheus"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 
 	docs "github.com/kgantsov/todogo/docs"
 	swaggerfiles "github.com/swaggo/files"
@@ -70,7 +70,7 @@ func main() {
 
 	r := gin.New()
 
-	p := ginprometheus.NewPrometheus("gin")
+	p := ginprometheus.NewPrometheus("todogo")
 	p.Use(r)
 
 	r.Use(gin.Recovery())
