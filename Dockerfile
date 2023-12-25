@@ -5,6 +5,7 @@ FROM golang:1.21.1 AS builder
 WORKDIR $GOPATH/src/github.com/kgantsov/todogo
 COPY ./ ./
 RUN go mod download
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 WORKDIR $GOPATH/src/github.com/kgantsov/todogo/
 RUN swag init -g ./cmd/server/main.go -o ./docs
 WORKDIR $GOPATH/src/github.com/kgantsov/todogo/cmd/server
