@@ -11,6 +11,8 @@ import (
 	newrelic "github.com/newrelic/go-agent"
 	"gorm.io/gorm"
 
+	"github.com/zsais/go-gin-prometheus"
+
 	docs "github.com/kgantsov/todogo/docs"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -67,6 +69,9 @@ func main() {
 	models.CreateTables(db)
 
 	r := gin.New()
+
+	p := ginprometheus.NewPrometheus("gin")
+	p.Use(r)
 
 	r.Use(gin.Recovery())
 
