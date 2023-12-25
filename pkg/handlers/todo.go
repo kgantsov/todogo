@@ -3,9 +3,9 @@ package handlers
 import (
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/gin-gonic/gin.v1"
 	"gorm.io/gorm"
 )
 
@@ -15,10 +15,24 @@ func OptionsTodo(c *gin.Context) {
 	c.Next()
 }
 
+// Create godoc
+// @Summary Create a TODO in a specific TODO list
+// @Schemes
+// @Description Returns an newly created TODO in a specific TODO list
+// @Tags TODO
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Param        body  body     models.Todo  true  "TODO"
+// @Success      200  {object}  models.Todo
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/todo/ [post]
 func CreateTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -31,7 +45,7 @@ func CreateTodo(c *gin.Context) {
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-		c.JSON(404, gin.H{"error": "Todo list not found"})
+		c.JSON(404, ErrorSchema{Error: "Todo list not found"})
 		return
 	}
 
@@ -51,14 +65,27 @@ func CreateTodo(c *gin.Context) {
 		db.Create(&todo)
 		c.JSON(201, todo)
 	} else {
-		c.JSON(422, gin.H{"error": e})
+		c.JSON(422, ErrorSchema{Error: e.Error()})
 	}
 }
 
+// Create godoc
+// @Summary Get TODOs in a specific TODO list
+// @Schemes
+// @Description Returns a list of TODOs in a specific TODO list
+// @Tags TODO
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Success      200  {object}  []models.Todo
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/todo/ [get]
 func GetTodos(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -71,7 +98,7 @@ func GetTodos(c *gin.Context) {
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-		c.JSON(404, gin.H{"error": "Todo list not found"})
+		c.JSON(404, ErrorSchema{Error: "Todo list not found"})
 		return
 	}
 
@@ -84,10 +111,24 @@ func GetTodos(c *gin.Context) {
 	c.JSON(200, todos)
 }
 
+// Create godoc
+// @Summary Get a TODO in a specific TODO list
+// @Schemes
+// @Description Returns a TODO in a specific TODO list
+// @Tags TODO
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Param        todoID    path     string  true  "ID of a TODO"
+// @Success      200  {object}  models.Todo
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/todo/{todoID}/ [get]
 func GetTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -101,7 +142,7 @@ func GetTodo(c *gin.Context) {
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-		c.JSON(404, gin.H{"error": "TODO list not found"})
+		c.JSON(404, ErrorSchema{Error: "TODO list not found"})
 		return
 	}
 
@@ -114,14 +155,29 @@ func GetTodo(c *gin.Context) {
 	if todo.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(200, todo)
 	} else {
-		c.JSON(404, gin.H{"error": "Todo not found"})
+		c.JSON(404, ErrorSchema{Error: "Todo not found"})
 	}
 }
 
+// Create godoc
+// @Summary Update a TODO in a specific TODO list
+// @Schemes
+// @Description Updates and returns a TODO in a specific TODO list
+// @Tags TODO
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Param        todoID    path     string  true  "ID of a TODO"
+// @Param        body  body     models.Todo  true  "TODO"
+// @Success      200  {object}  models.Todo
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/todo/{todoID}/ [put]
 func UpdateTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -143,7 +199,7 @@ func UpdateTodo(c *gin.Context) {
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-		c.JSON(404, gin.H{"error": "Todo list not found"})
+		c.JSON(404, ErrorSchema{Error: "Todo list not found"})
 		return
 	}
 
@@ -171,14 +227,28 @@ func UpdateTodo(c *gin.Context) {
 		db.Save(&todo)
 		c.JSON(200, todo)
 	} else {
-		c.JSON(404, gin.H{"error": "Todo not found"})
+		c.JSON(404, ErrorSchema{Error: "Todo not found"})
 	}
 }
 
+// Create godoc
+// @Summary Delete a TODO from a specific TODO list
+// @Schemes
+// @Description Deletes a TODO from a specific TODO list
+// @Tags TODO
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Param        todoID    path     string  true  "ID of a TODO"
+// @Success      200  {object}  models.Todo
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/todo/{todoID}/ [delete]
 func DeleteTodo(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -192,7 +262,7 @@ func DeleteTodo(c *gin.Context) {
 	db.Where("user_id = ? AND id = ?", currentUser.ID, listID).First(&todoList)
 
 	if todoList.ID == uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-		c.JSON(404, gin.H{"error": "Todo list not found"})
+		c.JSON(404, ErrorSchema{Error: "Todo list not found"})
 		return
 	}
 
@@ -207,6 +277,6 @@ func DeleteTodo(c *gin.Context) {
 
 		c.Writer.WriteHeader(204)
 	} else {
-		c.JSON(404, gin.H{"error": "Todo not found"})
+		c.JSON(404, ErrorSchema{Error: "Todo not found"})
 	}
 }

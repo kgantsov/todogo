@@ -3,9 +3,9 @@ package handlers
 import (
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/gin-gonic/gin.v1"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +15,19 @@ func OptionsTodoList(c *gin.Context) {
 	c.Next()
 }
 
+// Create godoc
+// @Summary Create a TODO list
+// @Schemes
+// @Description Returns an newly created TODO list
+// @Tags TODO list
+// @Accept json
+// @Produce json
+// @Param        body  body     models.TodoList  true  "TODO list"
+// @Success      200  {object}  models.TodoList
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/ [post]
 func CreateTodoList(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
@@ -37,6 +50,18 @@ func CreateTodoList(c *gin.Context) {
 	}
 }
 
+// Create godoc
+// @Summary Get a TODO lists
+// @Schemes
+// @Description Returns TODO lists
+// @Tags TODO list
+// @Accept json
+// @Produce json
+// @Success      200  {object}  []models.TodoList
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/ [get]
 func GetTodoLists(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
@@ -53,6 +78,19 @@ func GetTodoLists(c *gin.Context) {
 	c.JSON(200, todoLists)
 }
 
+// Create godoc
+// @Summary Get a TODO list
+// @Schemes
+// @Description Returns a particular TODO list by its ID
+// @Tags TODO list
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Success      200  {object}  models.TodoList
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/ [get]
 func GetTodoList(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
@@ -75,6 +113,20 @@ func GetTodoList(c *gin.Context) {
 	}
 }
 
+// Create godoc
+// @Summary Update a TODO list
+// @Schemes
+// @Description Updates a particular TODO list by its ID
+// @Tags TODO list
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Param        body  body     models.TodoList  true  "TODO list"
+// @Success      200  {object}  models.TodoList
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/ [put]
 func UpdateTodoList(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
@@ -115,6 +167,19 @@ func UpdateTodoList(c *gin.Context) {
 	}
 }
 
+// Create godoc
+// @Summary Delte a TODO list
+// @Schemes
+// @Description Deletes a particular TODO list by its ID
+// @Tags TODO list
+// @Accept json
+// @Produce json
+// @Param        listID    path     string  true  "ID of a TODO list"
+// @Success      200  {object}  models.TodoList
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /list/{listID}/ [delete]
 func DeleteTodoList(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {

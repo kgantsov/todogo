@@ -3,10 +3,10 @@ package handlers
 import (
 	"errors"
 
+	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/gin-gonic/gin.v1"
 	"gorm.io/gorm"
 )
 

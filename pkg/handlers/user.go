@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/gin-gonic/gin.v1"
 	"gorm.io/gorm"
 )
 
@@ -32,10 +32,22 @@ func isValidEmail(email string) bool {
 	return false
 }
 
+// Create godoc
+// @Summary Create a user
+// @Schemes
+// @Description Returns an newly created user
+// @Tags registration
+// @Accept json
+// @Produce json
+// @Param        body  body     models.User  true  "User object"
+// @Success      200  {object}  models.User
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Router       /user/ [post]
 func CreateUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -44,7 +56,7 @@ func CreateUser(c *gin.Context) {
 
 	if e == nil {
 		if !isValidEmail(user.Email) {
-			c.JSON(400, gin.H{"error": "Email address is not valid"})
+			c.JSON(400, ErrorSchema{Error: "Email address is not valid"})
 			return
 		}
 		user.Password = hashPassword(user.Password)
@@ -54,7 +66,7 @@ func CreateUser(c *gin.Context) {
 		db.Where("email = ?", user.Email).First(&exisingUser)
 
 		if exisingUser.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-			c.JSON(409, gin.H{"error": "User with this email already exists"})
+			c.JSON(409, ErrorSchema{Error: "User with this email already exists"})
 		} else {
 			user.ID = uuid.NewV4()
 			db.Create(&user)
@@ -62,14 +74,26 @@ func CreateUser(c *gin.Context) {
 		}
 
 	} else {
-		c.JSON(422, gin.H{"error": e})
+		c.JSON(422, ErrorSchema{Error: e.Error()})
 	}
 }
 
+// Create godoc
+// @Summary Get list of users
+// @Schemes
+// @Description Returns a list of users
+// @Tags users
+// @Accept json
+// @Produce json
+// @Success      200  {object}  []models.User
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /user/ [get]
 func GetUsers(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -82,10 +106,23 @@ func GetUsers(c *gin.Context) {
 	c.JSON(200, users)
 }
 
+// Create godoc
+// @Summary Get a user
+// @Schemes
+// @Description Returns a user by its ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param        userID    path     string  true  "ID of a User"
+// @Success      200  {object}  models.User
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /user/{userID}/ [get]
 func GetUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -94,7 +131,7 @@ func GetUser(c *gin.Context) {
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
 	if userID != currentUser.ID {
-		c.JSON(403, gin.H{"error": "Access denied"})
+		c.JSON(403, ErrorSchema{Error: "Access denied"})
 		return
 	}
 
@@ -105,14 +142,28 @@ func GetUser(c *gin.Context) {
 	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
 		c.JSON(200, user)
 	} else {
-		c.JSON(404, gin.H{"error": "User not found"})
+		c.JSON(404, ErrorSchema{Error: "User not found"})
 	}
 }
 
+// Create godoc
+// @Summary Update a user
+// @Schemes
+// @Description Updates a user by its ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param        userID    path     string  true  "ID of a User"
+// @Param        body  body     models.User  true  "User object"
+// @Success      200  {object}  models.User
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /user/{userID}/ [put]
 func UpdateUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -121,7 +172,7 @@ func UpdateUser(c *gin.Context) {
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
 	if userID != currentUser.ID {
-		c.JSON(403, gin.H{"error": "Access denied"})
+		c.JSON(403, ErrorSchema{Error: "Access denied"})
 		return
 	}
 
@@ -134,7 +185,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	if !isValidEmail(newUser.Email) {
-		c.JSON(400, gin.H{"error": "Email address is not valid"})
+		c.JSON(400, ErrorSchema{Error: "Email address is not valid"})
 		return
 	}
 
@@ -157,14 +208,27 @@ func UpdateUser(c *gin.Context) {
 
 		c.JSON(200, user)
 	} else {
-		c.JSON(404, gin.H{"error": "User not found"})
+		c.JSON(404, ErrorSchema{Error: "User not found"})
 	}
 }
 
+// Create godoc
+// @Summary Delete a user
+// @Schemes
+// @Description Deletes a user by its ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param        userID    path     string  true  "ID of a User"
+// @Success      204  {object}  models.User
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Security     HttpBearer
+// @Router       /user/{userID}/ [delete]
 func DeleteUser(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
@@ -173,7 +237,7 @@ func DeleteUser(c *gin.Context) {
 	currentUser := c.MustGet("CurrentUser").(models.User)
 
 	if userID != currentUser.ID {
-		c.JSON(403, gin.H{"error": "Access denied"})
+		c.JSON(403, ErrorSchema{Error: "Access denied"})
 		return
 	}
 
@@ -186,6 +250,6 @@ func DeleteUser(c *gin.Context) {
 
 		c.Writer.WriteHeader(204)
 	} else {
-		c.JSON(404, gin.H{"error": "User not found"})
+		c.JSON(404, ErrorSchema{Error: "User not found"})
 	}
 }

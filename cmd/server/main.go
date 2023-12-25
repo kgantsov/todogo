@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/kgantsov/todogo/pkg/handlers"
 	"github.com/kgantsov/todogo/pkg/models"
 	newrelic "github.com/newrelic/go-agent"
-	"gopkg.in/gin-gonic/gin.v1"
 	"gorm.io/gorm"
+
+	docs "github.com/kgantsov/todogo/docs"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func DBMiddleware(db gorm.DB) gin.HandlerFunc {
@@ -42,6 +46,14 @@ func NewRelicMiddleware(appName, newRelicKey string) gin.HandlerFunc {
 	}
 }
 
+// @title TODOGO API
+// @version 1.0
+// @description This is a sample TODO application.
+
+// @BasePath /
+// @securityDefinitions.apikey  HttpBearer
+// @in                          header
+// @name                        Auth-Token
 func main() {
 	debug := flag.Bool("debug", false, "Debug flag")
 	port := flag.Int("port", 8080, "Port")
@@ -57,6 +69,9 @@ func main() {
 	r := gin.New()
 
 	r.Use(gin.Recovery())
+
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	NewrelicAppName := os.Getenv("NEWRELIC_APP_NAME")
 	NewrelicAppKey := os.Getenv("NEWRELIC_APP_KEY")

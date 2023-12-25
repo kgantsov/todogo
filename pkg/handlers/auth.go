@@ -4,19 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
 	"gopkg.in/dgrijalva/jwt-go.v3"
-	"gopkg.in/gin-gonic/gin.v1"
 	"gorm.io/gorm"
 )
 
 var mySigningKey = []byte("secret")
-
-type LoginForm struct {
-	Email    string `form:"email" json:"email" binding:"required"`
-	Password string `form:"Password" json:"Password" binding:"required"`
-}
 
 func OptionsLogin(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "DELETE,POST,PUT")
@@ -24,35 +19,49 @@ func OptionsLogin(c *gin.Context) {
 	c.Next()
 }
 
+// @BasePath /api/v1
+
+// Create godoc
+// @Summary Create auth token
+// @Schemes
+// @Description Returns an newly created authentication token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param        body  body     LoginSchema  true  "User credentials"
+// @Success      200  {object}  TokenSchema
+// @Failure      401  {object}  ErrorSchema
+// @Failure      500  {object}  ErrorSchema
+// @Router       /auth/login/ [post]
 func Login(c *gin.Context) {
 	db, ok := c.MustGet("db").(gorm.DB)
 	if !ok {
-		c.JSON(500, gin.H{"error": "No connection to DB"})
+		c.JSON(500, ErrorSchema{Error: "No connection to DB"})
 		return
 	}
 
-	var loginForm LoginForm
-	e := c.BindJSON(&loginForm)
+	var loginSchema LoginSchema
+	e := c.BindJSON(&loginSchema)
 
 	if e != nil {
-		c.JSON(401, gin.H{"error": e})
+		c.JSON(401, ErrorSchema{Error: e.Error()})
 		return
 	}
 
 	var user models.User
 
-	db.Where("email = ?", loginForm.Email).Find(&user)
+	db.Where("email = ?", loginSchema.Email).Find(&user)
 
 	if user.ID != uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000") {
-		if hashPassword(loginForm.Password) == user.Password {
+		if hashPassword(loginSchema.Password) == user.Password {
 			token, err := createToken(user.ID)
 			if err == nil {
-				c.JSON(201, gin.H{"token": token})
+				c.JSON(201, TokenSchema{Token: token})
 				return
 			}
 		}
 	}
-	c.JSON(401, gin.H{"error": "Login or password is incorrect"})
+	c.JSON(401, ErrorSchema{Error: "Login or password is incorrect"})
 }
 
 func createToken(userID uuid.UUID) (string, error) {

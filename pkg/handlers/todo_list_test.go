@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/kgantsov/todogo/pkg/models"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/gin-gonic/gin.v1"
 	"gorm.io/gorm"
 )
 

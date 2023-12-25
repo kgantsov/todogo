@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
-	"gopkg.in/gin-gonic/gin.v1"
 )
 
 var (
