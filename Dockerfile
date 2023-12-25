@@ -5,6 +5,8 @@ FROM golang:1.21.1 AS builder
 WORKDIR $GOPATH/src/github.com/kgantsov/todogo
 COPY ./ ./
 RUN go mod download
+WORKDIR $GOPATH/src/github.com/kgantsov/todogo/
+RUN swag init -g ./cmd/server/main.go -o ./docs
 WORKDIR $GOPATH/src/github.com/kgantsov/todogo/cmd/server
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /app .
 
